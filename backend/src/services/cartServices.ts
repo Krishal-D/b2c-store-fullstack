@@ -34,10 +34,11 @@ export const cartService = {
 
         if (existingCartItem) {
             return cartModel.updateCartItem(
-                existingCartItem.id,
                 {
                     quantity: existingCartItem.quantity + data.quantity
-                }
+                },
+                existingCartItem.id,
+                userId
             )
         }
 
@@ -45,6 +46,7 @@ export const cartService = {
     },
 
     async updateCartItem(
+        userId: number,
         id: unknown,
         data: UpdateCartItemInput
     ) {
@@ -60,8 +62,9 @@ export const cartService = {
         }
 
         const cartItem = await cartModel.updateCartItem(
+            data,
             cartItemId,
-            data
+            userId
         )
 
         if (!cartItem) {
@@ -74,7 +77,7 @@ export const cartService = {
         return cartItem
     },
 
-    async deleteCartItem(id: unknown) {
+    async deleteCartItem(id: unknown, userId: number) {
 
         const cartItemId = Number(id)
 
@@ -82,7 +85,7 @@ export const cartService = {
             throw validationError("Invalid cart item id")
         }
 
-        const cartItem = await cartModel.deleteCartItem(cartItemId)
+        const cartItem = await cartModel.deleteCartItem(cartItemId, userId)
 
         if (!cartItem) {
             throw Object.assign(

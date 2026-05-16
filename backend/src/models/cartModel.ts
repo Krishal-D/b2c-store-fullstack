@@ -43,34 +43,36 @@ export const cartModel = {
     },
 
     async updateCartItem(
+        data: UpdateCartItemInput,
         id: number,
-        data: UpdateCartItemInput
+        userId: number
     ): Promise<CartItem | null> {
 
         const result = await pool.query(
             `
             UPDATE cart_items
             SET quantity = $1
-            WHERE id = $2
+            WHERE id = $2 AND user_id=$3
             RETURNING *
             `,
             [
                 data.quantity,
-                id
+                id,
+                userId
             ]
         )
 
         return result.rows[0] || null
     },
 
-    async deleteCartItem(id: number): Promise<CartItem | null> {
+    async deleteCartItem(id: number, userId: number): Promise<CartItem | null> {
         const result = await pool.query(
             `
             DELETE FROM cart_items
-            WHERE id = $1
+            WHERE id = $1 AND user_id=$2
             RETURNING *
             `,
-            [id]
+            [id, userId]
         )
 
         return result.rows[0] || null

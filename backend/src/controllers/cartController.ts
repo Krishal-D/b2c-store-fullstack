@@ -63,8 +63,13 @@ export const cartController = {
         next: NextFunction
     ) {
         try {
+            if (!req.user) {
+                return res.status(401).json({ message: "Unauthorized" })
+            }
+
 
             const cartItem = await cartService.updateCartItem(
+                req.user.id,
                 req.params.id,
                 req.body
             )
@@ -85,9 +90,13 @@ export const cartController = {
         next: NextFunction
     ) {
         try {
+            if (!req.user) {
+                return res.status(401).json({ message: "Unauthorized" })
+            }
 
             const cartItem = await cartService.deleteCartItem(
-                req.params.id
+                req.params.id,
+                req.user?.id
             )
 
             return res.status(200).json({

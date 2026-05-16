@@ -70,7 +70,7 @@ export const orderService = {
             )
 
 
-            await cartModel.deleteCartItem(item.id)
+            await cartModel.deleteCartItem(item.id, userId)
         }
 
         return order
