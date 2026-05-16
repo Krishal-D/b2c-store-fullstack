@@ -89,5 +89,9 @@ export const orderService = {
         }
 
         return orderModel.getOrderItems(parsedOrderId)
-    }
+    },
+
+    async getAllOrders() {
+        return orderModel.getAllOrders()
+    },
 }

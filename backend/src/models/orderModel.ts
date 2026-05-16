@@ -69,5 +69,13 @@ export const orderModel = {
         )
 
         return result.rows
-    }
+    },
+    async getAllOrders(): Promise<Order[]> {
+        const result = await pool.query(`
+        SELECT * FROM orders
+        ORDER BY created_at DESC
+    `)
+
+        return result.rows
+    },
 }

@@ -41,5 +41,17 @@ export const orderController = {
         } catch (error) {
             next(error)
         }
+    },
+
+    async getAllOrders(req: Request, res: Response, next: NextFunction) {
+        try {
+            const orders = await orderService.getAllOrders()
+
+            return res.status(200).json({ orders })
+
+        } catch (error) {
+            next(error)
+        }
     }
+
 }
