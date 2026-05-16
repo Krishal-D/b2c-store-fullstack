@@ -7,6 +7,7 @@ import { errorHandler } from "./src/middleware/errorHandling";
 import type { Request, Response } from "express";
 import productRoutes from "./src/routes/productRoutes"
 import cartRoutes from './src/routes/cartRoutes'
+import orderRoutes from "./src/routes/orderRoutes"
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/auth", authRoutes)
 app.use("/api/products", productRoutes)
 app.use("/api/cart", cartRoutes)
+app.use("/api/orders", orderRoutes)
 app.use(errorHandler)
 
 app.listen(PORT, () => {
