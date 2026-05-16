@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser"
 import authRoutes from "./src/routes/authRoutes"
 import { errorHandler } from "./src/middleware/errorHandling";
 import type { Request, Response } from "express";
+import productRoutes from "./src/routes/productRoutes"
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/auth", authRoutes)
+app.use("/api/products", productRoutes)
 app.use(errorHandler)
 
 app.listen(PORT, () => {
