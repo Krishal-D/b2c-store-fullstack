@@ -107,4 +107,18 @@ export const productModel = {
 
         return result.rows
     },
+
+    async reduceStock(
+        productId: number,
+        quantity: number
+    ): Promise<void> {
+        await pool.query(
+            `
+        UPDATE products
+        SET stock_quantity = stock_quantity - $1
+        WHERE id = $2
+        `,
+            [quantity, productId]
+        )
+    }
 }

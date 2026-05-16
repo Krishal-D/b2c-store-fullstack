@@ -24,10 +24,18 @@ export const orderService = {
                 item.product_id
             )
 
+
             if (!product) {
                 throw Object.assign(
                     new Error(`Product ${item.product_id} not found`),
                     { status: 404 }
+                )
+            }
+
+            if (product.stock_quantity < item.quantity) {
+                throw Object.assign(
+                    new Error(`Not enough stock for ${product.name}`),
+                    { status: 400 }
                 )
             }
 
@@ -55,6 +63,12 @@ export const orderService = {
                 item.quantity,
                 Number(product.price)
             )
+
+            await productModel.reduceStock(
+                item.product_id,
+                item.quantity
+            )
+
 
             await cartModel.deleteCartItem(item.id)
         }
