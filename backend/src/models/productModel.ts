@@ -6,11 +6,24 @@ import {
 } from "../types/productTypes"
 
 export const productModel = {
-    async getAllProducts(): Promise<Product[]> {
-        const result = await pool.query(`
-            SELECT * FROM products
-            ORDER BY created_at DESC
-        `)
+    async getAllProducts(
+        limit: number,
+        offset: number,
+        sortBy: string,
+        sortOrder: string
+    ): Promise<Product[]> {
+        const allowedSortBy = ["created_at", "price", "name"]
+        const safeSortBy = allowedSortBy.includes(sortBy) ? sortBy : "created_at"
+        const safeSortOrder = sortOrder.toUpperCase() === "ASC" ? "ASC" : "DESC"
+
+        const result = await pool.query(
+            `
+        SELECT * FROM products
+        ORDER BY ${safeSortBy} ${safeSortOrder}
+        LIMIT $1 OFFSET $2
+        `,
+            [limit, offset]
+        )
 
         return result.rows
     },

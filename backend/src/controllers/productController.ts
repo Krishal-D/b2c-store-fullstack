@@ -4,9 +4,9 @@ import { productService } from "../services/productServices"
 export const productController = {
     async getProducts(req: Request, res: Response, next: NextFunction) {
         try {
-            const { search, categoryId } = req.query
+            const { search, categoryId, page, limit, sortBy, sortOrder } = req.query
 
-            const products = await productService.getProducts(search, categoryId)
+            const products = await productService.getProducts(search, categoryId, page, limit, sortBy, sortOrder)
 
             return res.status(200).json({
                 products

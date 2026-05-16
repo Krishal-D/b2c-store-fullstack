@@ -6,7 +6,7 @@ function validationError(message: string): Error {
 }
 
 export const productService = {
-    async getProducts(search?: unknown, categoryId?: unknown) {
+    async getProducts(search?: unknown, categoryId?: unknown, page?: unknown, limit?: unknown, sortBy?: unknown, sortOrder?: unknown) {
         if (search && typeof search === "string") {
             return productModel.searchProducts(search.trim())
         }
@@ -20,8 +20,16 @@ export const productService = {
 
             return productModel.filterProductsByCategory(parsedCategoryId)
         }
+        const parsedPage = Number(page) || 1
+        const parsedLimit = Number(limit) || 10
+        const offset = (parsedPage - 1) * parsedLimit
 
-        return productModel.getAllProducts()
+        return productModel.getAllProducts(
+            parsedLimit,
+            offset,
+            typeof sortBy === "string" ? sortBy : "created_at",
+            typeof sortOrder === "string" ? sortOrder : "DESC"
+        )
     },
 
     async getProductById(id: unknown) {
