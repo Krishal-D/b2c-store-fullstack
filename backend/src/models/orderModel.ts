@@ -78,4 +78,15 @@ export const orderModel = {
 
         return result.rows
     },
+    async getOrderById(orderId: number): Promise<Order | null> {
+        const result = await pool.query(
+            `
+        SELECT * FROM orders
+        WHERE id = $1
+        `,
+            [orderId]
+        )
+
+        return result.rows[0] || null
+    }
 }

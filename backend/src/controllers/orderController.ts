@@ -35,7 +35,10 @@ export const orderController = {
 
     async getOrderItems(req: Request, res: Response, next: NextFunction) {
         try {
-            const orderItems = await orderService.getOrderItems(req.params.id)
+            if (!req.user) {
+                return res.status(401).json({ message: "Unauthorized" })
+            }
+            const orderItems = await orderService.getOrderItems(req.params.id, req.user?.id)
 
             return res.status(200).json({ orderItems })
         } catch (error) {

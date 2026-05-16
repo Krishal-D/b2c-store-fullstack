@@ -80,12 +80,21 @@ export const orderService = {
         return orderModel.getOrdersByUser(userId)
     },
 
-    async getOrderItems(orderId: unknown) {
+    async getOrderItems(orderId: unknown, userId: number) {
 
         const parsedOrderId = Number(orderId)
 
         if (!Number.isInteger(parsedOrderId) || parsedOrderId <= 0) {
             throw validationError("Invalid order id")
+        }
+
+        const order = await orderModel.getOrderById(parsedOrderId)
+        if (!order) {
+            throw Object.assign(new Error("Order not found"), { status: 404 })
+        }
+
+        if (order.user_id !== userId) {
+            throw Object.assign(new Error("Access denied"), { status: 403 })
         }
 
         return orderModel.getOrderItems(parsedOrderId)
