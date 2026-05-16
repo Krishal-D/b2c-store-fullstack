@@ -8,6 +8,7 @@ import type { Request, Response } from "express";
 import productRoutes from "./src/routes/productRoutes"
 import cartRoutes from './src/routes/cartRoutes'
 import orderRoutes from "./src/routes/orderRoutes"
+import categoryRoutes from "./src/routes/categoryRoutes"
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use("/api/auth", authRoutes)
 app.use("/api/products", productRoutes)
 app.use("/api/cart", cartRoutes)
 app.use("/api/orders", orderRoutes)
+app.use("/api/categories", categoryRoutes)
 app.use(errorHandler)
 
 app.listen(PORT, () => {
