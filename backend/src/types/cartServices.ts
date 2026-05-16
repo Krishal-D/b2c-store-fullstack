@@ -27,6 +27,20 @@ export const cartService = {
             throw validationError("Quantity must be greater than 0")
         }
 
+        const existingCartItem = await cartModel.findCartItemByUserAndProduct(
+            userId,
+            data.product_id
+        )
+
+        if (existingCartItem) {
+            return cartModel.updateCartItem(
+                existingCartItem.id,
+                {
+                    quantity: existingCartItem.quantity + data.quantity
+                }
+            )
+        }
+
         return cartModel.addCartItem(userId, data)
     },
 

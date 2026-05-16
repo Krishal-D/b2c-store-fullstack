@@ -74,5 +74,19 @@ export const cartModel = {
         )
 
         return result.rows[0] || null
-    }
+    },
+    async findCartItemByUserAndProduct(
+        userId: number,
+        productId: number
+    ): Promise<CartItem | null> {
+        const result = await pool.query(
+            `
+        SELECT * FROM cart_items
+        WHERE user_id = $1 AND product_id = $2
+        `,
+            [userId, productId]
+        )
+
+        return result.rows[0] || null
+    },
 }
