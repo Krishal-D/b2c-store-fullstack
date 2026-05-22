@@ -4,6 +4,9 @@ import { useAuth } from "../hooks/useAuth"
 import { useCart } from "../context/cartContext"
 import { getCartItems } from "../api/cart"
 import type { CartItem } from "../types/cart"
+import { checkout } from "../api/orders"
+import { Link, useNavigate } from "react-router-dom"
+
 
 export function Cart() {
     const { token } = useAuth()
@@ -11,6 +14,9 @@ export function Cart() {
 
     const [cartItems, setCartItems] = useState<CartItem[]>([])
     const [loading, setLoading] = useState(true)
+    const [checkoutLoading, setCheckoutLoading] = useState(false)
+    const [message, setMessage] = useState("")
+    const navigate = useNavigate()
 
     useEffect(() => {
         async function loadCart() {
@@ -36,6 +42,27 @@ export function Cart() {
     const total = cartItems.reduce((sum, item) => {
         return sum + Number(item.price) * item.quantity
     }, 0)
+
+    async function handleCheckout() {
+        if (!token) {
+            setMessage("Please sign in before checkout.")
+            return
+        }
+
+        setCheckoutLoading(true)
+        setMessage("")
+
+        try {
+            await checkout(token)
+            setCartItems([])
+            setCartCount(0)
+            navigate("/orders")
+        } catch {
+            setMessage("Checkout failed. Please check your cart and try again.")
+        } finally {
+            setCheckoutLoading(false)
+        }
+    }
 
     return (
         <div className="min-h-screen bg-neutral-100">
@@ -82,21 +109,35 @@ export function Cart() {
                                 </div>
 
                                 <button
+                                    onClick={handleCheckout}
+                                    disabled={checkoutLoading}
                                     className="
-                                        rounded-xl
-                                        bg-emerald-500
-                                        px-6
-                                        py-3
-                                        font-medium
-                                        text-white
-                                        transition
-                                        hover:bg-emerald-600
-                                    "
+                                            rounded-xl
+                                            bg-emerald-500
+                                            px-6
+                                            py-3
+                                            font-medium
+                                            text-white
+                                            transition
+                                            hover:bg-emerald-600
+                                            disabled:cursor-not-allowed
+                                            disabled:opacity-60
+                                        "
                                 >
-                                    Proceed to Checkout
+                                    {checkoutLoading ? "Processing..." : "Proceed to Checkout"}
                                 </button>
                             </div>
                         </div>
+                        {message && (
+                            <p
+                                className={`mt-4 text-sm font-medium ${message.includes("successfully")
+                                    ? "text-emerald-600"
+                                    : "text-red-500"
+                                    }`}
+                            >
+                                {message}
+                            </p>
+                        )}
 
                         <div className="mt-8 space-y-4">
                             {cartItems.map((item) => (
@@ -159,6 +200,7 @@ export function Cart() {
                                 </div>
                             ))}
                         </div>
+
                     </>
                 )}
             </main>

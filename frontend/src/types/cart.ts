@@ -17,3 +17,12 @@ export interface CartItem {
     image_url: string | null
     stock_quantity: number
 }
+
+export interface AddToCartResponse {
+    cartItem: CartItem
+    message: string
+}
+
+export interface CartResponse {
+    cartItems: CartItem[]
+}

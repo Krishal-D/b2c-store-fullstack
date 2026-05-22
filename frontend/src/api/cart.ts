@@ -1,14 +1,6 @@
 import { api } from "./client"
-import type{ CartItem } from "../types/cart"
-
-interface AddToCartResponse {
-    cartItem: CartItem
-    message: string
-}
-
-interface CartResponse {
-    cartItems: CartItem[]
-}
+import type { CartItem } from "../types/cart"
+import type { AddToCartResponse, CartResponse } from "../types/cart"
 
 export async function addToCart(
     token: string,
