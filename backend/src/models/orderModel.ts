@@ -62,9 +62,20 @@ export const orderModel = {
     async getOrderItems(orderId: number): Promise<OrderItem[]> {
         const result = await pool.query(
             `
-            SELECT * FROM order_items
-            WHERE order_id = $1
-            `,
+        SELECT 
+            order_items.id,
+            order_items.order_id,
+            order_items.product_id,
+            order_items.quantity,
+            order_items.price,
+            products.name,
+            products.description,
+            products.image_url
+        FROM order_items
+        JOIN products
+        ON order_items.product_id = products.id
+        WHERE order_items.order_id = $1
+        `,
             [orderId]
         )
 
