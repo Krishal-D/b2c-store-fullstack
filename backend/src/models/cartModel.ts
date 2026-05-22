@@ -10,10 +10,23 @@ export const cartModel = {
     async getCartItems(userId: number): Promise<CartItem[]> {
         const result = await pool.query(
             `
-            SELECT * FROM cart_items
-            WHERE user_id = $1
-            ORDER BY created_at DESC
-            `,
+        SELECT 
+            cart_items.id,
+            cart_items.user_id,
+            cart_items.product_id,
+            cart_items.quantity,
+            cart_items.created_at,
+            products.name,
+            products.description,
+            products.price,
+            products.image_url,
+            products.stock_quantity
+        FROM cart_items
+        JOIN products
+        ON cart_items.product_id = products.id
+        WHERE cart_items.user_id = $1
+        ORDER BY cart_items.created_at DESC
+        `,
             [userId]
         )
 

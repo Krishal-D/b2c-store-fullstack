@@ -1,5 +1,5 @@
 import { api } from "./client"
-import type { CartItem } from "../types"
+import type{ CartItem } from "../types/cart"
 
 interface AddToCartResponse {
     cartItem: CartItem

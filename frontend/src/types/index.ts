@@ -31,11 +31,3 @@ export interface Product {
     category_id: number | null
     created_at: string
 }
-
-export interface CartItem {
-    id: number
-    user_id: number
-    product_id: number
-    quantity: number
-    created_at: string
-}
