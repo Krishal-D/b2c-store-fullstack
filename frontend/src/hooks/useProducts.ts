@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import { getProducts, type Product } from "../api/products"
-
+import { getProducts} from "../api/products"
+import type { Product } from "../types"
 export function useProducts() {
     const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)

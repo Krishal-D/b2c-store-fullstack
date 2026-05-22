@@ -21,3 +21,21 @@ export interface RegisterFormData {
     email: string
     password: string
 }
+export interface Product {
+    id: number
+    name: string
+    description: string
+    price: string
+    image_url: string | null
+    stock_quantity: number
+    category_id: number | null
+    created_at: string
+}
+
+export interface CartItem {
+    id: number
+    user_id: number
+    product_id: number
+    quantity: number
+    created_at: string
+}

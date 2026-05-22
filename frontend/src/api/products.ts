@@ -1,15 +1,5 @@
 import { api } from "./client"
-
-export interface Product {
-    id: number
-    name: string
-    description: string
-    price: string
-    image_url: string | null
-    stock_quantity: number
-    category_id: number | null
-    created_at: string
-}
+import type { Product } from "../types"
 
 interface ProductsResponse {
     products: Product[]

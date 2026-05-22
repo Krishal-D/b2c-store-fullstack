@@ -4,6 +4,7 @@ import { Register } from "./pages/Register"
 import { ProtectedRoute } from "./components/layout/ProtectedRoute"
 import { Dashboard } from "./pages/Dashboard"
 import { Products } from "./pages/Products"
+import { Cart } from "./pages/Cart"
 
 function App() {
     return (
@@ -26,6 +27,15 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <Products />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/cart"
+                element={
+                    <ProtectedRoute>
+                        <Cart />
                     </ProtectedRoute>
                 }
             />

@@ -1,11 +1,41 @@
+import { useState } from "react"
 import { Button } from "../ui/Button"
-import type { Product } from "../../api/products"
+import type { Product } from "../../types"
+import { addToCart } from "../../api/cart"
+import { useAuth } from "../../hooks/useAuth"
+import { useCart } from "../../context/cartContext"
+
 
 interface ProductCardProps {
     product: Product
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+
+    const { token } = useAuth()
+    const { incrementCart } = useCart()
+    const [loading, setLoading] = useState(false)
+    const [message, setMessage] = useState("")
+
+    async function handleAddToCart() {
+        if (!token) {
+            setMessage("Please sign in to add items to your cart.")
+            return
+        }
+
+        setLoading(true)
+        setMessage("")
+
+        try {
+            await addToCart(token, product.id, 1)
+            incrementCart(1)
+            setMessage("Added to cart successfully.")
+        } catch {
+            setMessage("Unable to add item to cart.")
+        } finally {
+            setLoading(false)
+        }
+    }
     return (
         <article
             className="
@@ -60,8 +90,27 @@ export function ProductCard({ product }: ProductCardProps) {
                     </span>
                 </div>
 
-                <Button className="mt-4 w-full">
-                    Add to Cart
+                {message && (
+                    <p
+                        className={`mt-3 text-sm ${message.includes("successfully")
+                                ? "text-emerald-600"
+                                : "text-red-500"
+                            }`}
+                    >
+                        {message}
+                    </p>
+                )}
+
+                <Button
+                    className="mt-4 w-full"
+                    onClick={handleAddToCart}
+                    disabled={loading || product.stock_quantity <= 0}
+                >
+                    {product.stock_quantity <= 0
+                        ? "Out of Stock"
+                        : loading
+                            ? "Adding..."
+                            : "Add to Cart"}
                 </Button>
             </div>
         </article>
