@@ -124,6 +124,7 @@ export const authController = {
 
             return res.status(200).json({
                 token: result.newAccessToken,
+                user:result.user,
                 message: "New tokens created successfully"
             })
 

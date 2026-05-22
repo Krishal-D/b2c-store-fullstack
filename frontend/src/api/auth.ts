@@ -30,3 +30,8 @@ export async function register(
 export async function logout(): Promise<void> {
     await api.post("/auth/logout")
 }
+
+export async function refresh(): Promise<AuthResponse> {
+    const response = await api.post<AuthResponse>("/auth/refresh")
+    return response.data
+}

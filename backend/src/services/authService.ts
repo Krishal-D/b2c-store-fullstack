@@ -137,7 +137,8 @@ export const authService = {
 
         return {
             newAccessToken,
-            newRefreshToken
+            newRefreshToken,
+            user
         }
     }
 }

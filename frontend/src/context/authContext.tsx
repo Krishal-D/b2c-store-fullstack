@@ -1,6 +1,7 @@
-import { createContext, useState, type ReactNode } from "react"
+import { createContext, useState, useEffect, type ReactNode } from "react"
 import type { User } from "../types"
 import * as authAPI from "../api/auth"
+import { refresh } from "../api/auth"
 
 interface AuthContextType {
     user: User | null
@@ -16,7 +17,24 @@ export const AuthContext = createContext<AuthContextType | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
     const [token, setToken] = useState<string | null>(null)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        async function restoreSession() {
+            try {
+                const data = await refresh()
+                setUser(data.user)
+                setToken(data.token)
+            } catch {
+                setUser(null)
+                setToken(null)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        restoreSession()
+    }, [])
 
     async function login(email: string, password: string) {
         setLoading(true)
