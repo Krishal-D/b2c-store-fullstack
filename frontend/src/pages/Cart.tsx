@@ -2,10 +2,10 @@ import { useEffect, useState } from "react"
 import { Navbar } from "../components/layout/Navbar"
 import { useAuth } from "../hooks/useAuth"
 import { useCart } from "../context/cartContext"
-import { getCartItems } from "../api/cart"
+import { getCartItems, deleteCartItem, updateCartItem } from "../api/cart"
 import type { CartItem } from "../types/cart"
 import { checkout } from "../api/orders"
-import { Link, useNavigate } from "react-router-dom"
+import {  useNavigate } from "react-router-dom"
 
 
 export function Cart() {
@@ -63,7 +63,70 @@ export function Cart() {
             setCheckoutLoading(false)
         }
     }
+    async function handleRemoveItem(cartItemId: number) {
+        if (!token) return
 
+        try {
+            await deleteCartItem(token, cartItemId)
+
+            const updatedItems = cartItems.filter(
+                item => item.id !== cartItemId
+            )
+
+            setCartItems(updatedItems)
+
+            const totalItems = updatedItems.reduce(
+                (sum, item) => sum + item.quantity,
+                0
+            )
+
+            setCartCount(totalItems)
+        } catch {
+            setMessage("Failed to remove item.")
+        }
+    }
+
+    async function handleQuantityChange(
+        cartItemId: number,
+        newQuantity: number
+    ) {
+        if (!token) return
+
+        if (newQuantity < 1) {
+            await handleRemoveItem(cartItemId)
+            return
+        }
+
+        try {
+            const response = await updateCartItem(
+                token,
+                cartItemId,
+                newQuantity
+            )
+
+            const updatedItems = cartItems.map((item) => {
+                if (item.id === cartItemId) {
+                    return {
+                        ...item,
+                        quantity: response.cartItem.quantity
+                    }
+                }
+
+                return item
+            })
+
+            setCartItems(updatedItems)
+
+            const totalItems = updatedItems.reduce(
+                (sum, item) => sum + item.quantity,
+                0
+            )
+
+            setCartCount(totalItems)
+        } catch {
+            setMessage("Failed to update quantity.")
+        }
+    }
     return (
         <div className="min-h-screen bg-neutral-100">
             <Navbar />
@@ -173,20 +236,44 @@ export function Cart() {
                                                 ${Number(item.price).toFixed(2)} each
                                             </p>
 
-                                            <div
-                                                className="
-                                                    mt-3
-                                                    inline-flex
-                                                    rounded-full
-                                                    bg-neutral-100
-                                                    px-3
-                                                    py-1
-                                                    text-sm
-                                                    font-medium
-                                                "
-                                            >
-                                                Qty {item.quantity}
+                                            <div className="mt-3 flex items-center gap-3">
+                                                <button
+                                                    onClick={() =>
+                                                        handleQuantityChange(item.id, item.quantity - 1)
+                                                    }
+                                                    className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 font-bold hover:bg-neutral-200"
+                                                >
+                                                    -
+                                                </button>
+
+                                                <span className="text-sm font-medium">
+                                                    Qty {item.quantity}
+                                                </span>
+
+                                                <button
+                                                    onClick={() =>
+                                                        handleQuantityChange(item.id, item.quantity + 1)
+                                                    }
+                                                    disabled={item.quantity >= item.stock_quantity}
+                                                    className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 font-bold hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
+                                                >
+                                                    +
+                                                </button>
                                             </div>
+
+                                            <button
+                                                onClick={() => handleRemoveItem(item.id)}
+                                                className="
+                                                                mt-3
+                                                                block
+                                                                text-sm
+                                                                font-medium
+                                                                text-red-500
+                                                                hover:text-red-600
+                                                            "
+                                            >
+                                                Remove
+                                            </button>
                                         </div>
 
                                         <p className="text-xl font-bold">

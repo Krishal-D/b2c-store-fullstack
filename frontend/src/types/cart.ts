@@ -26,3 +26,13 @@ export interface AddToCartResponse {
 export interface CartResponse {
     cartItems: CartItem[]
 }
+
+export interface DeleteCartItemResponse {
+    cartItem: CartItem
+    message: string
+}
+
+export interface UpdateCartItemResponse {
+    cartItem: CartItem
+    message: string
+}
