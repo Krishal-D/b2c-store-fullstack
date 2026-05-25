@@ -1,18 +1,41 @@
+import { useEffect, useState } from "react"
 import { Navbar } from "../components/layout/Navbar"
 import { useProducts } from "../hooks/useProducts"
 import { ProductCard } from "../components/products/ProductCard"
-import { useState } from "react"
+import { getCategories } from "../api/categories"
+import type { Category } from "../types"
 
 export function Products() {
     const { products, loading, error } = useProducts()
+
     const [search, setSearch] = useState("")
+    const [selectedCategoryId, setSelectedCategoryId] = useState("all")
+    const [categories, setCategories] = useState<Category[]>([])
+
+    useEffect(() => {
+        async function loadCategories() {
+            try {
+                const data = await getCategories()
+                setCategories(data)
+            } catch {
+                setCategories([])
+            }
+        }
+
+        loadCategories()
+    }, [])
 
     const filteredProducts = products.filter((product) => {
-        return product.name
+        const matchesSearch = product.name
             .toLowerCase()
             .includes(search.toLowerCase())
-    })
 
+        const matchesCategory =
+            selectedCategoryId === "all" ||
+            product.category_id === Number(selectedCategoryId)
+
+        return matchesSearch && matchesCategory
+    })
 
     return (
         <div className="min-h-screen bg-neutral-100">
@@ -33,7 +56,7 @@ export function Products() {
                     </p>
                 </section>
 
-                <section className="mt-8 flex items-center justify-between">
+                <section className="mt-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h2 className="text-2xl font-bold">Products</h2>
                         <p className="text-sm text-neutral-500">
@@ -41,25 +64,55 @@ export function Products() {
                         </p>
                     </div>
 
-                    <input
-                        type="text"
-                        value={search}
-                        onChange={(event) => setSearch(event.target.value)}
-                        placeholder="Search products..."
-                        className="
-                            w-full
-                            rounded-xl
-                            border
-                            border-neutral-200
-                            bg-white
-                            px-4
-                            py-3
-                            text-sm
-                            outline-none
-                            focus:border-emerald-500
-                            md:max-w-sm
-                        "
-                    />
+                    <div className="flex w-full flex-col gap-3 md:max-w-xl md:flex-row">
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
+                            placeholder="Search products..."
+                            className="
+                                w-full
+                                rounded-xl
+                                border
+                                border-neutral-200
+                                bg-white
+                                px-4
+                                py-3
+                                text-sm
+                                outline-none
+                                focus:border-emerald-500
+                            "
+                        />
+
+                        <select
+                            value={selectedCategoryId}
+                            onChange={(event) =>
+                                setSelectedCategoryId(event.target.value)
+                            }
+                            className="
+                                rounded-xl
+                                border
+                                border-neutral-200
+                                bg-white
+                                px-4
+                                py-3
+                                text-sm
+                                outline-none
+                                focus:border-emerald-500
+                            "
+                        >
+                            <option value="all">All categories</option>
+
+                            {categories.map((category) => (
+                                <option
+                                    key={category.id}
+                                    value={category.id}
+                                >
+                                    {category.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </section>
 
                 {loading && (
@@ -77,6 +130,18 @@ export function Products() {
                     <p className="mt-8 rounded-xl bg-red-50 p-4 text-sm text-red-600">
                         {error}
                     </p>
+                )}
+
+                {!loading && !error && filteredProducts.length === 0 && (
+                    <div className="mt-8 rounded-2xl bg-white p-8 text-center shadow-sm">
+                        <h3 className="text-xl font-semibold">
+                            No products found
+                        </h3>
+
+                        <p className="mt-2 text-neutral-500">
+                            Try changing your search or category filter.
+                        </p>
+                    </div>
                 )}
 
                 {!loading && !error && filteredProducts.length > 0 && (
