@@ -2,16 +2,23 @@ import { useState } from "react"
 import { Link, NavLink } from "react-router-dom"
 import { Menu, Search, ShoppingCart, User, X } from "lucide-react"
 import { useCart } from "../../context/cartContext"
+import { useAuth } from "../../hooks/useAuth"
 
 export function Navbar() {
     const { cartCount } = useCart()
+    const { user } = useAuth()
     const [menuOpen, setMenuOpen] = useState(false)
+
+    const isAdmin = user?.role === "admin"
+
+    const productsPath = isAdmin ? "/admin/products" : "/products"
+    const ordersPath = isAdmin ? "/admin/orders" : "/orders"
 
     return (
         <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/80 backdrop-blur">
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
                 <Link
-                    to="/products"
+                    to={productsPath}
                     className="text-xl font-bold tracking-tight"
                 >
                     Cartly
@@ -27,26 +34,14 @@ export function Navbar() {
                         <input
                             type="text"
                             placeholder="Search products..."
-                            className="
-                                w-full
-                                rounded-xl
-                                border
-                                border-neutral-200
-                                bg-neutral-50
-                                pl-10
-                                pr-4
-                                py-2
-                                text-sm
-                                outline-none
-                                focus:border-emerald-500
-                            "
+                            className="w-full rounded-xl border border-neutral-200 bg-neutral-50 pl-10 pr-4 py-2 text-sm outline-none focus:border-emerald-500"
                         />
                     </div>
                 </div>
 
                 <nav className="hidden md:flex items-center gap-6">
                     <NavLink
-                        to="/products"
+                        to={productsPath}
                         className={({ isActive }) =>
                             isActive
                                 ? "font-semibold text-black"
@@ -57,7 +52,7 @@ export function Navbar() {
                     </NavLink>
 
                     <NavLink
-                        to="/orders"
+                        to={ordersPath}
                         className={({ isActive }) =>
                             isActive
                                 ? "font-semibold text-black"
@@ -69,56 +64,23 @@ export function Navbar() {
                 </nav>
 
                 <div className="flex items-center gap-4 ml-6">
-                    <Link to="/cart" className="relative">
-                        <ShoppingCart size={22} />
+                    {!isAdmin && (
+                        <Link to="/cart" className="relative">
+                            <ShoppingCart size={22} />
 
-                        <span
-                            className="
-                                absolute
-                                -right-2
-                                -top-2
-                                flex
-                                h-5
-                                w-5
-                                items-center
-                                justify-center
-                                rounded-full
-                                bg-emerald-500
-                                text-xs
-                                text-white
-                            "
-                        >
-                            {cartCount}
-                        </span>
-                    </Link>
+                            <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-xs text-white">
+                                {cartCount}
+                            </span>
+                        </Link>
+                    )}
 
-                    <button
-                        className="
-                            hidden
-                            h-9
-                            w-9
-                            items-center
-                            justify-center
-                            rounded-full
-                            bg-neutral-100
-                            md:flex
-                        "
-                    >
+                    <button className="hidden h-9 w-9 items-center justify-center rounded-full bg-neutral-100 md:flex">
                         <User size={18} />
                     </button>
 
                     <button
                         onClick={() => setMenuOpen((prev) => !prev)}
-                        className="
-                            flex
-                            h-9
-                            w-9
-                            items-center
-                            justify-center
-                            rounded-full
-                            bg-neutral-100
-                            md:hidden
-                        "
+                        className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 md:hidden"
                         aria-label="Toggle menu"
                     >
                         {menuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -137,25 +99,13 @@ export function Navbar() {
                         <input
                             type="text"
                             placeholder="Search products..."
-                            className="
-                                w-full
-                                rounded-xl
-                                border
-                                border-neutral-200
-                                bg-neutral-50
-                                pl-10
-                                pr-4
-                                py-2
-                                text-sm
-                                outline-none
-                                focus:border-emerald-500
-                            "
+                            className="w-full rounded-xl border border-neutral-200 bg-neutral-50 pl-10 pr-4 py-2 text-sm outline-none focus:border-emerald-500"
                         />
                     </div>
 
                     <nav className="mt-4 flex flex-col gap-3">
                         <NavLink
-                            to="/products"
+                            to={productsPath}
                             onClick={() => setMenuOpen(false)}
                             className={({ isActive }) =>
                                 isActive
@@ -167,7 +117,7 @@ export function Navbar() {
                         </NavLink>
 
                         <NavLink
-                            to="/orders"
+                            to={ordersPath}
                             onClick={() => setMenuOpen(false)}
                             className={({ isActive }) =>
                                 isActive
@@ -178,17 +128,19 @@ export function Navbar() {
                             Orders
                         </NavLink>
 
-                        <NavLink
-                            to="/cart"
-                            onClick={() => setMenuOpen(false)}
-                            className={({ isActive }) =>
-                                isActive
-                                    ? "rounded-xl bg-neutral-100 px-4 py-2 font-semibold text-black"
-                                    : "rounded-xl px-4 py-2 text-neutral-600 hover:bg-neutral-100"
-                            }
-                        >
-                            Cart ({cartCount})
-                        </NavLink>
+                        {!isAdmin && (
+                            <NavLink
+                                to="/cart"
+                                onClick={() => setMenuOpen(false)}
+                                className={({ isActive }) =>
+                                    isActive
+                                        ? "rounded-xl bg-neutral-100 px-4 py-2 font-semibold text-black"
+                                        : "rounded-xl px-4 py-2 text-neutral-600 hover:bg-neutral-100"
+                                }
+                            >
+                                Cart ({cartCount})
+                            </NavLink>
+                        )}
                     </nav>
                 </div>
             )}

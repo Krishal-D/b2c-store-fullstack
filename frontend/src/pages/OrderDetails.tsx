@@ -7,7 +7,7 @@ import type { OrderItem } from "../types/order"
 
 export function OrderDetails() {
     const { id } = useParams()
-    const { token } = useAuth()
+    const { token, user } = useAuth()
 
     const [items, setItems] = useState<OrderItem[]>([])
     const [loading, setLoading] = useState(true)
@@ -37,8 +37,7 @@ export function OrderDetails() {
 
             <main className="mx-auto max-w-7xl px-6 py-10">
                 <Link
-                    to="/orders"
-                    className="text-sm font-medium text-emerald-600"
+                    to={user?.role === "admin" ? "/admin/orders" : "/orders"}
                 >
                     ← Back to orders
                 </Link>

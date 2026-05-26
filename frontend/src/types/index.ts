@@ -37,3 +37,11 @@ export interface Category {
     name: string
     created_at: string
 }
+export interface CreateProductInput {
+    name: string
+    description: string
+    price: number
+    image_url?: string | null
+    stock_quantity: number
+    category_id?: number | null
+}

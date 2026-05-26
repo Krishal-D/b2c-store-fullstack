@@ -8,6 +8,8 @@ import { Cart } from "./pages/Cart"
 import { Orders } from "./pages/Orders"
 import { OrderDetails } from "./pages/OrderDetails"
 import { ProductDetails } from "./pages/ProductDetails"
+import { AdminProducts } from "./pages/AdminProducts"
+import { AdminOrders } from "./pages/AdminOrders"
 
 function App() {
     return (
@@ -41,7 +43,8 @@ function App() {
                         <Cart />
                     </ProtectedRoute>
                 }
-            />,
+            />
+
             <Route
                 path="/orders"
                 element={
@@ -49,7 +52,8 @@ function App() {
                         <Orders />
                     </ProtectedRoute>
                 }
-            />,
+            />
+
             <Route
                 path="/orders/:id"
                 element={
@@ -57,12 +61,30 @@ function App() {
                         <OrderDetails />
                     </ProtectedRoute>
                 }
-            />,
+            />
+
             <Route
                 path="/products/:id"
                 element={
                     <ProtectedRoute>
                         <ProductDetails />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/admin/products"
+                element={
+                    <ProtectedRoute adminOnly>
+                        <AdminProducts />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/admin/orders"
+                element={
+                    <ProtectedRoute adminOnly>
+                        <AdminOrders />
                     </ProtectedRoute>
                 }
             />

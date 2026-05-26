@@ -55,3 +55,18 @@ export async function getOrderItems(
 
     return response.data.orderItems
 }
+
+export async function getAllOrders(
+    token: string
+): Promise<Order[]> {
+    const response = await api.get<OrdersResponse>(
+        "/orders/admin/all",
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    )
+
+    return response.data.orders
+}

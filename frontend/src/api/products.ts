@@ -1,5 +1,5 @@
 import { api } from "./client"
-import type { Product } from "../types"
+import type { Product, CreateProductInput } from "../types"
 
 interface ProductsResponse {
     products: Product[]
@@ -22,4 +22,55 @@ export async function getProductById(
     )
 
     return response.data.product
+}
+
+export async function createProduct(
+    token: string,
+    productData: CreateProductInput
+) {
+    const response = await api.post(
+        "/products",
+        productData,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    )
+
+    return response.data
+}
+
+export async function deleteProduct(
+    token: string,
+    productId: number
+) {
+    const response = await api.delete(
+        `/products/${productId}`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    )
+
+    return response.data
+}
+
+export async function updateProduct(
+    token: string,
+    productId: number,
+    productData: Partial<CreateProductInput>
+) {
+    const response = await api.patch(
+        `/products/${productId}`,
+        productData,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    )
+
+    return response.data
 }
