@@ -99,5 +99,22 @@ export const orderModel = {
         )
 
         return result.rows[0] || null
+    },
+    async updateOrderStatus(
+        orderId: number,
+        status: string
+    ): Promise<Order> {
+        const result = await pool.query(
+            `
+        UPDATE orders
+        SET status = $1
+        WHERE id = $2
+        RETURNING *
+        `,
+            [status, orderId]
+        )
+
+        return result.rows[0]
     }
+
 }

@@ -10,6 +10,7 @@ import { OrderDetails } from "./pages/OrderDetails"
 import { ProductDetails } from "./pages/ProductDetails"
 import { AdminProducts } from "./pages/AdminProducts"
 import { AdminOrders } from "./pages/AdminOrders"
+import { Checkout } from "./pages/Checkout"
 
 function App() {
     return (
@@ -85,6 +86,15 @@ function App() {
                 element={
                     <ProtectedRoute adminOnly>
                         <AdminOrders />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/checkout"
+                element={
+                    <ProtectedRoute>
+                        <Checkout />
                     </ProtectedRoute>
                 }
             />

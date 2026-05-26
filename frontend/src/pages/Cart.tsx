@@ -1,26 +1,30 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { Navbar } from "../components/layout/Navbar"
 import { useAuth } from "../hooks/useAuth"
 import { useCart } from "../context/cartContext"
-import { getCartItems, deleteCartItem, updateCartItem } from "../api/cart"
+import {
+    getCartItems,
+    deleteCartItem,
+    updateCartItem
+} from "../api/cart"
 import type { CartItem } from "../types/cart"
-import { checkout } from "../api/orders"
-import {  useNavigate } from "react-router-dom"
-
 
 export function Cart() {
     const { token } = useAuth()
     const { setCartCount } = useCart()
+    const navigate = useNavigate()
 
     const [cartItems, setCartItems] = useState<CartItem[]>([])
     const [loading, setLoading] = useState(true)
-    const [checkoutLoading, setCheckoutLoading] = useState(false)
     const [message, setMessage] = useState("")
-    const navigate = useNavigate()
 
     useEffect(() => {
         async function loadCart() {
-            if (!token) return
+            if (!token) {
+                setLoading(false)
+                return
+            }
 
             try {
                 const data = await getCartItems(token)
@@ -31,6 +35,8 @@ export function Cart() {
                 }, 0)
 
                 setCartCount(totalItems)
+            } catch {
+                setMessage("Failed to load cart.")
             } finally {
                 setLoading(false)
             }
@@ -43,44 +49,24 @@ export function Cart() {
         return sum + Number(item.price) * item.quantity
     }, 0)
 
-    async function handleCheckout() {
-        if (!token) {
-            setMessage("Please sign in before checkout.")
-            return
-        }
-
-        setCheckoutLoading(true)
-        setMessage("")
-
-        try {
-            await checkout(token)
-            setCartItems([])
-            setCartCount(0)
-            navigate("/orders")
-        } catch {
-            setMessage("Checkout failed. Please check your cart and try again.")
-        } finally {
-            setCheckoutLoading(false)
-        }
-    }
     async function handleRemoveItem(cartItemId: number) {
         if (!token) return
 
         try {
             await deleteCartItem(token, cartItemId)
 
-            const updatedItems = cartItems.filter(
-                item => item.id !== cartItemId
-            )
+            const updatedItems = cartItems.filter((item) => {
+                return item.id !== cartItemId
+            })
 
             setCartItems(updatedItems)
 
-            const totalItems = updatedItems.reduce(
-                (sum, item) => sum + item.quantity,
-                0
-            )
+            const totalItems = updatedItems.reduce((sum, item) => {
+                return sum + item.quantity
+            }, 0)
 
             setCartCount(totalItems)
+            setMessage("Item removed from cart.")
         } catch {
             setMessage("Failed to remove item.")
         }
@@ -117,16 +103,17 @@ export function Cart() {
 
             setCartItems(updatedItems)
 
-            const totalItems = updatedItems.reduce(
-                (sum, item) => sum + item.quantity,
-                0
-            )
+            const totalItems = updatedItems.reduce((sum, item) => {
+                return sum + item.quantity
+            }, 0)
 
             setCartCount(totalItems)
+            setMessage("Cart updated.")
         } catch {
             setMessage("Failed to update quantity.")
         }
     }
+
     return (
         <div className="min-h-screen bg-neutral-100">
             <Navbar />
@@ -134,7 +121,10 @@ export function Cart() {
             <main className="mx-auto max-w-7xl px-6 py-10">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold">Your Cart</h1>
+                        <h1 className="text-3xl font-bold">
+                            Your Cart
+                        </h1>
+
                         <p className="mt-1 text-sm text-neutral-500">
                             Review your selected products before checkout.
                         </p>
@@ -142,7 +132,9 @@ export function Cart() {
                 </div>
 
                 {loading && (
-                    <p className="mt-6 text-neutral-500">Loading cart...</p>
+                    <p className="mt-6 text-neutral-500">
+                        Loading cart...
+                    </p>
                 )}
 
                 {!loading && cartItems.length === 0 && (
@@ -160,7 +152,7 @@ export function Cart() {
                 {!loading && cartItems.length > 0 && (
                     <>
                         <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-4">
                                 <div>
                                     <p className="text-sm text-neutral-500">
                                         Cart Summary
@@ -172,30 +164,31 @@ export function Cart() {
                                 </div>
 
                                 <button
-                                    onClick={handleCheckout}
-                                    disabled={checkoutLoading}
+                                    onClick={() => navigate("/checkout")}
+                                    disabled={cartItems.length === 0}
                                     className="
-                                            rounded-xl
-                                            bg-emerald-500
-                                            px-6
-                                            py-3
-                                            font-medium
-                                            text-white
-                                            transition
-                                            hover:bg-emerald-600
-                                            disabled:cursor-not-allowed
-                                            disabled:opacity-60
-                                        "
+                                        rounded-xl
+                                        bg-emerald-500
+                                        px-6
+                                        py-3
+                                        font-medium
+                                        text-white
+                                        transition
+                                        hover:bg-emerald-600
+                                        disabled:cursor-not-allowed
+                                        disabled:opacity-60
+                                    "
                                 >
-                                    {checkoutLoading ? "Processing..." : "Proceed to Checkout"}
+                                    Proceed to Checkout
                                 </button>
                             </div>
                         </div>
+
                         {message && (
                             <p
-                                className={`mt-4 text-sm font-medium ${message.includes("successfully")
-                                    ? "text-emerald-600"
-                                    : "text-red-500"
+                                className={`mt-4 text-sm font-medium ${message.includes("Failed")
+                                    ? "text-red-500"
+                                    : "text-emerald-600"
                                     }`}
                             >
                                 {message}
@@ -239,7 +232,10 @@ export function Cart() {
                                             <div className="mt-3 flex items-center gap-3">
                                                 <button
                                                     onClick={() =>
-                                                        handleQuantityChange(item.id, item.quantity - 1)
+                                                        handleQuantityChange(
+                                                            item.id,
+                                                            item.quantity - 1
+                                                        )
                                                     }
                                                     className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 font-bold hover:bg-neutral-200"
                                                 >
@@ -252,9 +248,15 @@ export function Cart() {
 
                                                 <button
                                                     onClick={() =>
-                                                        handleQuantityChange(item.id, item.quantity + 1)
+                                                        handleQuantityChange(
+                                                            item.id,
+                                                            item.quantity + 1
+                                                        )
                                                     }
-                                                    disabled={item.quantity >= item.stock_quantity}
+                                                    disabled={
+                                                        item.quantity >=
+                                                        item.stock_quantity
+                                                    }
                                                     className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 font-bold hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
                                                 >
                                                     +
@@ -262,15 +264,10 @@ export function Cart() {
                                             </div>
 
                                             <button
-                                                onClick={() => handleRemoveItem(item.id)}
-                                                className="
-                                                                mt-3
-                                                                block
-                                                                text-sm
-                                                                font-medium
-                                                                text-red-500
-                                                                hover:text-red-600
-                                                            "
+                                                onClick={() =>
+                                                    handleRemoveItem(item.id)
+                                                }
+                                                className="mt-3 block text-sm font-medium text-red-500 hover:text-red-600"
                                             >
                                                 Remove
                                             </button>
@@ -287,7 +284,6 @@ export function Cart() {
                                 </div>
                             ))}
                         </div>
-
                     </>
                 )}
             </main>
