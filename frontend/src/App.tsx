@@ -7,6 +7,7 @@ import { Products } from "./pages/Products"
 import { Cart } from "./pages/Cart"
 import { Orders } from "./pages/Orders"
 import { OrderDetails } from "./pages/OrderDetails"
+import { ProductDetails } from "./pages/ProductDetails"
 
 function App() {
     return (
@@ -54,6 +55,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <OrderDetails />
+                    </ProtectedRoute>
+                }
+            />,
+            <Route
+                path="/products/:id"
+                element={
+                    <ProtectedRoute>
+                        <ProductDetails />
                     </ProtectedRoute>
                 }
             />
