@@ -1,4 +1,5 @@
 import { useState } from "react"
+import toast from "react-hot-toast"
 import { Button } from "../ui/Button"
 import type { Product } from "../../types"
 import { addToCart } from "../../api/cart"
@@ -16,23 +17,21 @@ export function ProductCard({ product }: ProductCardProps) {
     const { token } = useAuth()
     const { incrementCart } = useCart()
     const [loading, setLoading] = useState(false)
-    const [message, setMessage] = useState("")
 
     async function handleAddToCart() {
         if (!token) {
-            setMessage("Please sign in to add items to your cart.")
+            toast.error("Please sign in to add items to your cart.")
             return
         }
 
         setLoading(true)
-        setMessage("")
 
         try {
             await addToCart(token, product.id, 1)
             incrementCart(1)
-            setMessage("Added to cart successfully.")
+            toast.success("Added to cart successfully.")
         } catch {
-            setMessage("Unable to add item to cart.")
+            toast.error("Unable to add item to cart.")
         } finally {
             setLoading(false)
         }
@@ -95,17 +94,6 @@ export function ProductCard({ product }: ProductCardProps) {
                         Stock: {product.stock_quantity}
                     </span>
                 </div>
-
-                {message && (
-                    <p
-                        className={`mt-3 text-sm ${message.includes("successfully")
-                            ? "text-emerald-600"
-                            : "text-red-500"
-                            }`}
-                    >
-                        {message}
-                    </p>
-                )}
 
                 <Button
                     className="mt-4 w-full"

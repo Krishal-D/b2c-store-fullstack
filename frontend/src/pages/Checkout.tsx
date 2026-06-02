@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import toast from "react-hot-toast"
 import { Navbar } from "../components/layout/Navbar"
 import { useAuth } from "../hooks/useAuth"
 import { useCart } from "../context/cartContext"
@@ -15,23 +16,21 @@ export function Checkout() {
     const [expiry, setExpiry] = useState("")
     const [cvv, setCvv] = useState("")
     const [loading, setLoading] = useState(false)
-    const [message, setMessage] = useState("")
 
     async function handleSubmit(event: React.FormEvent) {
         event.preventDefault()
 
         if (!token) {
-            setMessage("Please login before checkout.")
+            toast.error("Please login before checkout.")
             return
         }
 
         if (!cardName || !cardNumber || !expiry || !cvv) {
-            setMessage("Please fill in all payment fields.")
+            toast.error("Please fill in all payment fields.")
             return
         }
 
         setLoading(true)
-        setMessage("")
 
         try {
             await mockCheckoutPayment(token, {
@@ -41,9 +40,15 @@ export function Checkout() {
                 cvv
             })
             setCartCount(0)
+            toast.success("Payment successful. Your order is being processed.")
             navigate("/orders")
         } catch {
-            setMessage("Payment failed. Please check your cart and try again.")
+            toast.error("Payment failed. Please check your cart and try again.", {
+                style: {
+                    background: "#fee2e2",
+                    color: "#991b1b"
+                }
+            })
         } finally {
             setLoading(false)
         }
@@ -71,11 +76,6 @@ export function Checkout() {
                         Demo card: <strong>4242 4242 4242 4242</strong>
                     </div>
 
-                    {message && (
-                        <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
-                            {message}
-                        </p>
-                    )}
 
                     <form onSubmit={handleSubmit} className="mt-8 space-y-5">
                         <div>

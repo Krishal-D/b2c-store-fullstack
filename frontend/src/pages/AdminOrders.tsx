@@ -99,7 +99,12 @@ export function AdminOrders() {
                                         </td>
 
                                         <td className="p-4">
-                                            <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
+                                            <span className={`rounded-full px-3 py-1 text-sm font-medium ${order.status === "pending"
+                                                ? "bg-yellow-100 text-yellow-700"
+                                                : order.status === "paid"
+                                                    ? "bg-emerald-50 text-emerald-700"
+                                                    : "bg-neutral-100 text-neutral-700"
+                                            }`}>
                                                 {order.status}
                                             </span>
                                         </td>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Navbar } from "../components/layout/Navbar"
 import { useAuth } from "../hooks/useAuth"
-import { getOrders } from "../api/orders"
+import { getUserOrders } from "../api/orders"
 import type { Order } from "../types/order"
 import { Link } from "react-router-dom"
 
@@ -16,7 +16,7 @@ export function Orders() {
             if (!token) return
 
             try {
-                const data = await getOrders(token)
+                const data = await getUserOrders(token)
                 setOrders(data)
             } finally {
                 setLoading(false)
@@ -78,15 +78,19 @@ export function Orders() {
                                 </div>
 
                                 <div
-                                    className="
+                                    className={`
                                         rounded-full
-                                        bg-emerald-100
                                         px-3
                                         py-1
                                         text-sm
                                         font-medium
-                                        text-emerald-700
-                                    "
+                                        ${order.status === "pending"
+                                            ? "bg-yellow-100 text-yellow-700"
+                                            : order.status === "paid"
+                                                ? "bg-emerald-100 text-emerald-700"
+                                                : "bg-neutral-100 text-neutral-700"
+                                        }
+                                    `}
                                 >
                                     {order.status}
                                 </div>

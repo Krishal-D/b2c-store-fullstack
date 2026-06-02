@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import toast from "react-hot-toast"
 import { Navbar } from "../components/layout/Navbar"
 import { useAuth } from "../hooks/useAuth"
 import { useCart } from "../context/cartContext"
@@ -17,7 +18,6 @@ export function Cart() {
 
     const [cartItems, setCartItems] = useState<CartItem[]>([])
     const [loading, setLoading] = useState(true)
-    const [message, setMessage] = useState("")
 
     useEffect(() => {
         async function loadCart() {
@@ -36,7 +36,7 @@ export function Cart() {
 
                 setCartCount(totalItems)
             } catch {
-                setMessage("Failed to load cart.")
+                toast.error("Failed to load cart.")
             } finally {
                 setLoading(false)
             }
@@ -66,9 +66,9 @@ export function Cart() {
             }, 0)
 
             setCartCount(totalItems)
-            setMessage("Item removed from cart.")
+            toast.success("Item removed from cart.")
         } catch {
-            setMessage("Failed to remove item.")
+            toast.error("Failed to remove item.")
         }
     }
 
@@ -108,9 +108,9 @@ export function Cart() {
             }, 0)
 
             setCartCount(totalItems)
-            setMessage("Cart updated.")
+            toast.success("Cart updated.")
         } catch {
-            setMessage("Failed to update quantity.")
+            toast.error("Failed to update quantity.")
         }
     }
 
@@ -183,17 +183,6 @@ export function Cart() {
                                 </button>
                             </div>
                         </div>
-
-                        {message && (
-                            <p
-                                className={`mt-4 text-sm font-medium ${message.includes("Failed")
-                                    ? "text-red-500"
-                                    : "text-emerald-600"
-                                    }`}
-                            >
-                                {message}
-                            </p>
-                        )}
 
                         <div className="mt-8 space-y-4">
                             {cartItems.map((item) => (

@@ -25,7 +25,7 @@ export async function checkout(
     return response.data
 }
 
-export async function getOrders(
+export async function getUserOrders(
     token: string
 ): Promise<Order[]> {
     const response = await api.get<OrdersResponse>(

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import toast from "react-hot-toast"
 import { Link, useParams } from "react-router-dom"
 import { Navbar } from "../components/layout/Navbar"
 import { Button } from "../components/ui/Button"
@@ -16,7 +17,6 @@ export function ProductDetails() {
     const [product, setProduct] = useState<Product | null>(null)
     const [loading, setLoading] = useState(true)
     const [adding, setAdding] = useState(false)
-    const [message, setMessage] = useState("")
 
     useEffect(() => {
         async function loadProduct() {
@@ -35,19 +35,18 @@ export function ProductDetails() {
 
     async function handleAddToCart() {
         if (!token || !product) {
-            setMessage("Please sign in to add items to your cart.")
+            toast.error("Please sign in to add items to your cart.")
             return
         }
 
         setAdding(true)
-        setMessage("")
 
         try {
             await addToCart(token, product.id, 1)
             incrementCart(1)
-            setMessage("Added to cart successfully.")
+            toast.success("Added to cart successfully.")
         } catch {
-            setMessage("Unable to add item to cart.")
+            toast.error("Unable to add item to cart.")
         } finally {
             setAdding(false)
         }
@@ -116,17 +115,6 @@ export function ProductDetails() {
                                 Stock available: {product.stock_quantity}
                             </p>
 
-                            {message && (
-                                <p
-                                    className={`mt-4 text-sm font-medium ${
-                                        message.includes("successfully")
-                                            ? "text-emerald-600"
-                                            : "text-red-500"
-                                    }`}
-                                >
-                                    {message}
-                                </p>
-                            )}
 
                             <Button
                                 className="mt-6 w-full md:w-fit"

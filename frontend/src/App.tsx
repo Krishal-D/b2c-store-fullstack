@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom"
+import { Toaster } from "react-hot-toast"
 import { Login } from "./pages/Login"
 import { Register } from "./pages/Register"
 import { ProtectedRoute } from "./components/layout/ProtectedRoute"
@@ -14,91 +15,96 @@ import { Checkout } from "./pages/Checkout"
 
 function App() {
     return (
-        <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+        <>
+            <Toaster position="top-right" />
 
-            <Route
-                path="/dashboard"
-                element={
-                    <ProtectedRoute>
-                        <Dashboard />
-                    </ProtectedRoute>
-                }
-            />
+            <Routes>
+                <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
-            <Route
-                path="/products"
-                element={
-                    <ProtectedRoute>
-                        <Products />
-                    </ProtectedRoute>
-                }
-            />
+                <Route
+                    path="/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <Dashboard />
+                        </ProtectedRoute>
+                    }
+                />
 
-            <Route
-                path="/cart"
-                element={
-                    <ProtectedRoute>
-                        <Cart />
-                    </ProtectedRoute>
-                }
-            />
+                <Route
+                    path="/products"
+                    element={
+                        <ProtectedRoute>
+                            <Products />
+                        </ProtectedRoute>
+                    }
+                />
 
-            <Route
-                path="/orders"
-                element={
-                    <ProtectedRoute>
-                        <Orders />
-                    </ProtectedRoute>
-                }
-            />
+                <Route
+                    path="/cart"
+                    element={
+                        <ProtectedRoute>
+                            <Cart />
+                        </ProtectedRoute>
+                    }
+                />
 
-            <Route
-                path="/orders/:id"
-                element={
-                    <ProtectedRoute>
-                        <OrderDetails />
-                    </ProtectedRoute>
-                }
-            />
+                <Route
+                    path="/orders"
+                    element={
+                        <ProtectedRoute>
+                            <Orders />
+                        </ProtectedRoute>
+                    }
+                />
 
-            <Route
-                path="/products/:id"
-                element={
-                    <ProtectedRoute>
-                        <ProductDetails />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/admin/products"
-                element={
-                    <ProtectedRoute adminOnly>
-                        <AdminProducts />
-                    </ProtectedRoute>
-                }
-            />
+                <Route
+                    path="/orders/:id"
+                    element={
+                        <ProtectedRoute>
+                            <OrderDetails />
+                        </ProtectedRoute>
+                    }
+                />
 
-            <Route
-                path="/admin/orders"
-                element={
-                    <ProtectedRoute adminOnly>
-                        <AdminOrders />
-                    </ProtectedRoute>
-                }
-            />
+                <Route
+                    path="/products/:id"
+                    element={
+                        <ProtectedRoute>
+                            <ProductDetails />
+                        </ProtectedRoute>
+                    }
+                />
 
-            <Route
-                path="/checkout"
-                element={
-                    <ProtectedRoute>
-                        <Checkout />
-                    </ProtectedRoute>
-                }
-            />
-        </Routes>
+                <Route
+                    path="/admin/products"
+                    element={
+                        <ProtectedRoute adminOnly>
+                            <AdminProducts />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/orders"
+                    element={
+                        <ProtectedRoute adminOnly>
+                            <AdminOrders />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/checkout"
+                    element={
+                        <ProtectedRoute>
+                            <Checkout />
+                        </ProtectedRoute>
+                    }
+                />
+            </Routes>
+        </>
     )
 }
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import toast from "react-hot-toast"
 import { Navbar } from "../components/layout/Navbar"
 import { useAuth } from "../hooks/useAuth"
 import { getProducts, deleteProduct, createProduct, updateProduct } from "../api/products"
@@ -12,7 +13,6 @@ export function AdminProducts() {
     const [products, setProducts] = useState<Product[]>([])
     const [categories, setCategories] = useState<Category[]>([])
     const [loading, setLoading] = useState(true)
-    const [message, setMessage] = useState("")
     const [formData, setFormData] = useState<CreateProductInput>({
         name: "",
         description: "",
@@ -71,7 +71,7 @@ export function AdminProducts() {
                     )
                 )
 
-                setMessage("Product updated successfully.")
+                toast.success("Product updated successfully.")
                 setEditingProductId(null)
             } else {
                 const data = await createProduct(token, payload)
@@ -81,8 +81,7 @@ export function AdminProducts() {
                     ...previousProducts
                 ])
 
-                setMessage("Product created successfully.")
-                setTimeout(() => setMessage(""), 3000)
+                toast.success("Product created successfully.")
             }
 
             setFormData({
@@ -94,7 +93,7 @@ export function AdminProducts() {
                 category_id: null
             })
         } catch {
-            setMessage("Failed to save product.")
+            toast.error("Failed to save product.")
         }
     }
 
@@ -114,9 +113,9 @@ export function AdminProducts() {
                 )
             )
 
-            setMessage("Product deleted successfully.")
+            toast.success("Product deleted successfully.")
         } catch {
-            setMessage("Failed to delete product.")
+            toast.error("Failed to delete product.")
         }
     }
 
@@ -170,17 +169,6 @@ export function AdminProducts() {
                             Fill in the product details below. Fields marked with * are required.
                         </p>
                     </div>
-
-                    {message && (
-                        <p
-                            className={`mt-4 rounded-xl px-4 py-3 text-sm font-medium ${message.includes("successfully")
-                                ? "bg-emerald-50 text-emerald-700"
-                                : "bg-red-50 text-red-600"
-                                }`}
-                        >
-                            {message}
-                        </p>
-                    )}
 
                     <div className="mt-6 grid gap-5 md:grid-cols-2">
                         <div>
