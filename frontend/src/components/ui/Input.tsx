@@ -3,12 +3,13 @@ import type { InputHTMLAttributes } from "react"
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     label: string
     error?: string
+    labelClassName?: string
 }
 
-export function Input({ label, error, className = "", ...props }: InputProps) {
+export function Input({ label, error, labelClassName = "", className = "", ...props }: InputProps) {
     return (
         <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-800">
+            <label className={`text-sm font-medium text-neutral-800 ${labelClassName}`}>
                 {label}
             </label>
 

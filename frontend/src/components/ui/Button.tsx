@@ -15,8 +15,8 @@ export function Button({
         "rounded-xl px-4 py-2.5 text-sm font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
 
     const variants = {
-        primary: "bg-[#0A0A0A] text-white hover:bg-neutral-800 shadow-sm",
-        secondary: "bg-white text-[#0A0A0A] border border-neutral-200 hover:bg-neutral-50"
+        primary: "bg-[#0A0A0A] text-white hover:bg-neutral-800 dark:bg-white dark:text-[#0A0A0A] dark:hover:bg-neutral-200 shadow-sm",
+        secondary: "bg-white text-[#0A0A0A] border border-neutral-200 hover:bg-neutral-50 dark:bg-neutral-800 dark:text-white dark:border-neutral-600 dark:hover:bg-neutral-700"
     }
 
     return (

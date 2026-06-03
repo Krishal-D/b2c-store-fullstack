@@ -37,6 +37,15 @@ export const userModel = {
             `UPDATE users SET refresh_token = NULL WHERE id = $1`,
             [userId]
         )
+    },
+
+    async updateName(userId: number, name: string): Promise<User | null> {
+        const result = await pool.query(
+            `UPDATE users SET name = $1 WHERE id = $2 RETURNING *`,
+            [name, userId]
+        )
+
+        return result.rows[0] || null
     }
 
 }

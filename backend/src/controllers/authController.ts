@@ -1,4 +1,5 @@
 import { authService } from "../services/authService"
+import { userModel } from "../models/userModel"
 import type {
     Request,
     Response,
@@ -128,6 +129,37 @@ export const authController = {
                 message: "New tokens created successfully"
             })
 
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async updateProfile(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) {
+        try {
+            if (!req.user) return res.status(401).json({ message: "Unauthorized" })
+
+            const { name } = req.body
+
+            if (!name || typeof name !== "string" || !name.trim()) {
+                return res.status(400).json({ message: "Invalid name" })
+            }
+
+            const updated = await userModel.updateName(req.user.id, name.trim())
+
+            if (!updated) return res.status(404).json({ message: "User not found" })
+
+            const publicUser = {
+                id: updated.id,
+                name: updated.name,
+                email: updated.email,
+                role: updated.role,
+            }
+
+            return res.status(200).json({ user: publicUser })
         } catch (error) {
             next(error)
         }

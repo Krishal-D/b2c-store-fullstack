@@ -9,6 +9,7 @@ import { Cart } from "./pages/Cart"
 import { Orders } from "./pages/Orders"
 import { OrderDetails } from "./pages/OrderDetails"
 import { ProductDetails } from "./pages/ProductDetails"
+import { Profile } from "./pages/Profile"
 import { AdminProducts } from "./pages/AdminProducts"
 import { AdminOrders } from "./pages/AdminOrders"
 import { Checkout } from "./pages/Checkout"
@@ -91,6 +92,15 @@ function App() {
                     element={
                         <ProtectedRoute adminOnly>
                             <AdminOrders />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute>
+                            <Profile />
                         </ProtectedRoute>
                     }
                 />

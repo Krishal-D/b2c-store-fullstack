@@ -9,7 +9,67 @@ body {
   font-family: "Inter", sans-serif;
   background: #f5f5f5;
   color: #0a0a0a;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+html.dark {
+  background: #0f172a;
+  color-scheme: dark;
+}
+
+html.dark body {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+html.dark header {
+  background-color: rgba(15, 23, 42, 0.8) !important;
+  border-color: #334155 !important;
+}
+
+html.dark .bg-white,
+html.dark .bg-neutral-50 {
+  background-color: #111827 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .bg-neutral-100 {
+  background-color: #1f2937 !important;
+}
+
+html.dark .text-neutral-600,
+html.dark .text-neutral-500 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-neutral-400 {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-black,
+html.dark .text-neutral-800 {
+  color: #f8fafc !important;
+}
+
+html.dark .hover\:bg-neutral-100:hover,
+html.dark .hover\:bg-neutral-50:hover {
+  background-color: #1f2937 !important;
+}
+
+html.dark .border-neutral-200 {
+  border-color: #334155 !important;
+}
+
+html.dark input {
+  background-color: #1f2937 !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+html.dark input::placeholder {
+  color: #64748b !important;
+}
+
 
 button,
 input,

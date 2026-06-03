@@ -35,3 +35,8 @@ export async function refresh(): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>("/auth/refresh")
     return response.data
 }
+
+export async function updateProfile(name: string): Promise<{ user: any }> {
+    const response = await api.patch<{ user: any }>("/auth/profile", { name })
+    return response.data
+}

@@ -69,7 +69,7 @@ export function Orders() {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-neutral-500">
-                                        Order #{order.id}
+                                        CT{String(order.id).padStart(3, "0")}
                                     </p>
 
                                     <h2 className="mt-1 text-lg font-semibold">

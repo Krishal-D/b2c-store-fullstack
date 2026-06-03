@@ -44,7 +44,7 @@ export function OrderDetails() {
 
                 <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
                     <p className="text-sm text-neutral-500">
-                        Order #{id}
+                        CT{String(id).padStart(3, "0")}
                     </p>
 
                     <h1 className="mt-1 text-3xl font-bold">

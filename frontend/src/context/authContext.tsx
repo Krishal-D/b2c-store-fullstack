@@ -10,6 +10,7 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<void>
     register: (name: string, email: string, password: string) => Promise<void>
     logout: () => Promise<void>
+    updateProfile?: (updates: Partial<User>) => Promise<void>
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null)
@@ -66,6 +67,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setToken(null)
     }
 
+    async function updateProfile(updates: Partial<User>) {
+        // If backend supports updating name, call it and replace user with response.
+        if (updates.name) {
+            try {
+                const res = await authAPI.updateProfile(updates.name)
+                setUser(res.user)
+                return
+            } catch (error) {
+                // fallback to optimistic local update
+                setUser((prev) => (prev ? { ...prev, ...updates } : prev))
+                throw error
+            }
+        }
+
+        // For other updates, apply locally (no backend yet).
+        setUser((prev) => {
+            if (!prev) return prev
+            return { ...prev, ...updates }
+        })
+    }
+
     return (
         <AuthContext.Provider
             value={{
@@ -75,6 +97,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 login,
                 register,
                 logout
+                ,
+                updateProfile
             }}
         >
             {children}

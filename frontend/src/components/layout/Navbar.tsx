@@ -1,24 +1,52 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, NavLink } from "react-router-dom"
-import { Menu, Search, ShoppingCart, User, X } from "lucide-react"
+import { Menu, Search, ShoppingCart, User, X, Sun, Moon } from "lucide-react"
 import { useCart } from "../../context/cartContext"
 import { useAuth } from "../../hooks/useAuth"
+import { Button } from "../ui/Button"
+import { Input } from "../ui/Input"
 
 export function Navbar() {
     const { cartCount } = useCart()
     const { user } = useAuth()
     const [menuOpen, setMenuOpen] = useState(false)
+    const [dark, setDark] = useState(false)
 
     const isAdmin = user?.role === "admin"
 
     const productsPath = isAdmin ? "/admin/products" : "/products"
     const ordersPath = isAdmin ? "/admin/orders" : "/orders"
 
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem("theme")
+            if (stored === "dark") {
+                setDark(true)
+                document.documentElement.classList.add("dark")
+            }
+        } catch {}
+    }, [])
+
+    function toggleTheme() {
+        const next = !dark
+        setDark(next)
+
+        try {
+            if (next) {
+                document.documentElement.classList.add("dark")
+                localStorage.setItem("theme", "dark")
+            } else {
+                document.documentElement.classList.remove("dark")
+                localStorage.setItem("theme", "light")
+            }
+        } catch {}
+    }
+
     return (
         <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/80 backdrop-blur">
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
                 <Link
-                    to={productsPath}
+                    to="/dashboard"
                     className="text-xl font-bold tracking-tight"
                 >
                     Cartly
@@ -30,11 +58,11 @@ export function Navbar() {
                             size={18}
                             className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
                         />
-
-                        <input
-                            type="text"
+                        <Input
+                            label="Search products"
+                            labelClassName="sr-only"
                             placeholder="Search products..."
-                            className="w-full rounded-xl border border-neutral-200 bg-neutral-50 pl-10 pr-4 py-2 text-sm outline-none focus:border-emerald-500"
+                            className="pl-10 bg-neutral-50 border-neutral-200"
                         />
                     </div>
                 </div>
@@ -74,9 +102,31 @@ export function Navbar() {
                         </Link>
                     )}
 
-                    <button className="hidden h-9 w-9 items-center justify-center rounded-full bg-neutral-100 md:flex">
+                    <Link
+                        to="/profile"
+                        className="hidden h-9 w-9 items-center justify-center rounded-full bg-neutral-100 md:flex"
+                        aria-label="Profile"
+                    >
                         <User size={18} />
-                    </button>
+                    </Link>
+
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        className="hidden h-9 w-9 rounded-full p-0 md:flex items-center justify-center"
+                        onClick={toggleTheme}
+                        aria-label="Toggle theme"
+                    >
+                        {dark ? (
+                            <div className="flex items-center gap-1.5">
+                                <Sun size={16} />
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-1.5">
+                                <Moon size={16} />
+                            </div>
+                        )}
+                    </Button>
 
                     <button
                         onClick={() => setMenuOpen((prev) => !prev)}
@@ -95,11 +145,11 @@ export function Navbar() {
                             size={18}
                             className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
                         />
-
-                        <input
-                            type="text"
+                        <Input
+                            label="Search products"
+                            labelClassName="sr-only"
                             placeholder="Search products..."
-                            className="w-full rounded-xl border border-neutral-200 bg-neutral-50 pl-10 pr-4 py-2 text-sm outline-none focus:border-emerald-500"
+                            className="pl-10 bg-neutral-50 border-neutral-200"
                         />
                     </div>
 
@@ -128,6 +178,18 @@ export function Navbar() {
                             Orders
                         </NavLink>
 
+                        <NavLink
+                            to="/profile"
+                            onClick={() => setMenuOpen(false)}
+                            className={({ isActive }) =>
+                                isActive
+                                    ? "rounded-xl bg-neutral-100 px-4 py-2 font-semibold text-black"
+                                    : "rounded-xl px-4 py-2 text-neutral-600 hover:bg-neutral-100"
+                            }
+                        >
+                            Profile
+                        </NavLink>
+
                         {!isAdmin && (
                             <NavLink
                                 to="/cart"
@@ -142,6 +204,21 @@ export function Navbar() {
                             </NavLink>
                         )}
                     </nav>
+
+                    <div className="mt-4 flex items-center justify-between gap-3">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            className="h-10 w-10 rounded-full p-0"
+                            onClick={toggleTheme}
+                            aria-label="Toggle theme"
+                        >
+                            {dark ? <Sun size={16} /> : <Moon size={16} />}
+                        </Button>
+                        <span className="text-sm text-neutral-600 dark:text-neutral-400">
+                            {dark ? "Dark mode" : "Light mode"}
+                        </span>
+                    </div>
                 </div>
             )}
         </header>
