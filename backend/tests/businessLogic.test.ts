@@ -9,6 +9,7 @@ describe("B2C Business Logic", () => {
     let userToken = ""
     let adminToken = ""
     let productId = 0
+    let completedOrderId = 0
 
     beforeAll(async () => {
         await request(app).post("/api/auth/register").send({
@@ -130,6 +131,27 @@ describe("B2C Business Logic", () => {
 
         expect(product.status).toBe(200)
         expect(product.body.product.stock_quantity).toBe(0)
+        completedOrderId = checkout.body.order.id
+    })
+
+    it("should return the user's order history", async () => {
+        const ordersResponse = await request(app)
+            .get("/api/orders")
+            .set("Authorization", `Bearer ${userToken}`)
+
+        expect(ordersResponse.status).toBe(200)
+        expect(Array.isArray(ordersResponse.body.orders)).toBe(true)
+        expect(ordersResponse.body.orders.some((order: any) => order.id === completedOrderId)).toBe(true)
+    })
+
+    it("should update the user's profile name", async () => {
+        const response = await request(app)
+            .patch("/api/auth/profile")
+            .set("Authorization", `Bearer ${userToken}`)
+            .send({ name: "Updated Test User" })
+
+        expect(response.status).toBe(200)
+        expect(response.body.user.name).toBe("Updated Test User")
     })
 
     it("should fail checkout when cart is empty", async () => {

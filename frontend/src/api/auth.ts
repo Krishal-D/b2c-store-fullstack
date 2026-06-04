@@ -36,7 +36,15 @@ export async function refresh(): Promise<AuthResponse> {
     return response.data
 }
 
-export async function updateProfile(name: string): Promise<{ user: any }> {
-    const response = await api.patch<{ user: any }>("/auth/profile", { name })
+export async function updateProfile(name: string, token: string): Promise<{ user: any }> {
+    const response = await api.patch<{ user: any }>(
+        "/auth/profile",
+        { name },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    )
     return response.data
 }

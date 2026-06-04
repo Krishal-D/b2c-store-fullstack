@@ -100,10 +100,6 @@ export function AdminProducts() {
     async function handleDelete(productId: number) {
         if (!token) return
 
-        const confirmed = window.confirm("Delete this product?")
-
-        if (!confirmed) return
-
         try {
             await deleteProduct(token, productId)
 
@@ -279,6 +275,21 @@ export function AdminProducts() {
                                 placeholder="https://example.com/product.jpg"
                                 className="w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm outline-none focus:border-emerald-500"
                             />
+                            {formData.image_url && (
+                                <div className="mt-3 flex items-center gap-4">
+                                    <div>
+                                        <p className="text-sm text-neutral-500">Preview</p>
+                                        <img
+                                            src={formData.image_url}
+                                            alt="Preview"
+                                            className="mt-2 h-28 w-28 rounded-xl object-cover border"
+                                        />
+                                    </div>
+                                    <p className="text-sm text-neutral-500 max-w-xl">
+                                        Make sure the URL points to a publicly accessible image.
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         <div className="md:col-span-2">
@@ -338,9 +349,12 @@ export function AdminProducts() {
                         <table className="w-full min-w-[720px]">
                             <thead>
                                 <tr className="border-b bg-neutral-50">
-                                    <th className="p-4 text-left text-sm font-semibold">
-                                        Product
-                                    </th>
+                                            <th className="p-4 text-left text-sm font-semibold">
+                                                Image
+                                            </th>
+                                            <th className="p-4 text-left text-sm font-semibold">
+                                                Product
+                                            </th>
 
                                     <th className="p-4 text-left text-sm font-semibold">
                                         Category ID
@@ -366,6 +380,20 @@ export function AdminProducts() {
                                         key={product.id}
                                         className="border-b last:border-b-0"
                                     >
+                                        <td className="p-4 w-24">
+                                            {product.image_url ? (
+                                                <img
+                                                    src={product.image_url}
+                                                    alt={product.name}
+                                                    className="h-16 w-16 rounded-xl object-cover"
+                                                />
+                                            ) : (
+                                                <div className="h-16 w-16 rounded-xl bg-neutral-100 flex items-center justify-center text-xs text-neutral-400">
+                                                    No Image
+                                                </div>
+                                            )}
+                                        </td>
+
                                         <td className="p-4">
                                             <div>
                                                 <p className="font-medium">
