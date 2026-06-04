@@ -100,6 +100,11 @@ jobs:
           cd ../backend
           npm install
 
+      - name: Run backend migrations
+        run: |
+          cd ../backend
+          npx ts-node migrate.ts
+
       - name: Seed backend database
         run: |
           cd ../backend
