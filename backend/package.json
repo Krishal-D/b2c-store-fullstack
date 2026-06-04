@@ -7,7 +7,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "seed": "ts-node-dev --transpile-only seed.ts",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "migrate": "ts-node migrate.ts"
   },
   "keywords": [],
   "author": "",
