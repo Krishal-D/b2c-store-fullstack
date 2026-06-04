@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react"
 import { Link, NavLink } from "react-router-dom"
-import { Menu, Search, ShoppingCart, User, X, Sun, Moon } from "lucide-react"
+import { Menu, ShoppingCart, User, X, Sun, Moon } from "lucide-react"
 import { useCart } from "../../context/cartContext"
 import { useAuth } from "../../hooks/useAuth"
 import { Button } from "../ui/Button"
-import { Input } from "../ui/Input"
 
 export function Navbar() {
     const { cartCount } = useCart()
@@ -24,7 +23,7 @@ export function Navbar() {
                 setDark(true)
                 document.documentElement.classList.add("dark")
             }
-        } catch {}
+        } catch { }
     }, [])
 
     function toggleTheme() {
@@ -39,7 +38,7 @@ export function Navbar() {
                 document.documentElement.classList.remove("dark")
                 localStorage.setItem("theme", "light")
             }
-        } catch {}
+        } catch { }
     }
 
     return (
@@ -52,22 +51,10 @@ export function Navbar() {
                     Cartly
                 </Link>
 
-                <div className="hidden md:flex flex-1 max-w-md mx-8">
-                    <div className="relative w-full">
-                        <Search
-                            size={18}
-                            className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
-                        />
-                        <Input
-                            label="Search products"
-                            labelClassName="sr-only"
-                            placeholder="Search products..."
-                            className="pl-10 bg-neutral-50 border-neutral-200"
-                        />
-                    </div>
-                </div>
+                <div className="hidden md:block flex-1 max-w-md mx-8" />
 
-                <nav className="hidden md:flex items-center gap-6">
+
+                <nav className="hidden md:flex flex-1 items-center justify-center gap-8">
                     <NavLink
                         to={productsPath}
                         className={({ isActive }) =>
@@ -91,7 +78,7 @@ export function Navbar() {
                     </NavLink>
                 </nav>
 
-                <div className="flex items-center gap-4 ml-6">
+                <div className="flex items-center gap-4">
                     {!isAdmin && (
                         <Link to="/cart" className="relative">
                             <ShoppingCart size={22} />
