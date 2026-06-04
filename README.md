@@ -1,409 +1,271 @@
-# B2C Store Backend
+# Cartly – B2C E-Commerce Platform
 
 ## Overview
 
-This project is the backend implementation of a full-stack Business-to-Consumer (B2C) ecommerce application. The backend provides RESTful APIs for authentication, product management, shopping cart functionality, order processing, category filtering, and administrative operations.
+Cartly is a full-stack B2C e-commerce platform that allows customers to browse products, manage a shopping cart, place orders, and complete payments through a simulated checkout process. The platform also includes an administrative interface for managing products and monitoring customer orders.
 
-The application is built using Express.js, TypeScript, PostgreSQL, and JWT authentication.
+The application was developed using React, TypeScript, Express.js, PostgreSQL, and JWT-based authentication.
 
 ---
 
-# Tech Stack
+## Features
 
-## Backend
+### Customer Features
+
+* User registration and login
+* JWT authentication with refresh tokens
+* Browse products
+* Search products
+* Filter products by category
+* View product details
+* Add products to cart
+* Update cart quantities
+* Remove products from cart
+* Checkout and payment simulation
+* View order history
+* View order details
+* Manage profile information
+
+### Administrator Features
+
+* Secure administrator login
+* Dashboard overview
+* Create products
+* Edit products
+* Delete products
+* View all customer orders
+
+---
+
+## Technology Stack
+
+### Frontend
+
+* React
+* TypeScript
+* React Router
+* Axios
+* Tailwind CSS
+* React Hot Toast
+
+### Backend
 
 * Node.js
 * Express.js
 * TypeScript
+* JWT Authentication
+* bcrypt
 
-## Database
+### Database
 
 * PostgreSQL
+* Neon PostgreSQL
 
-## Authentication
-
-* JWT Access Tokens
-* JWT Refresh Tokens
-* HttpOnly Cookies
-* bcrypt password hashing
-
-## Testing
+### Testing
 
 * Jest
 * Supertest
+* Playwright
 
-## CI/CD
+### Deployment
 
-* GitHub Actions
+* Frontend: Vercel
+* Backend: Render
+* Database: Neon
 
 ---
 
-# Features
+## System Architecture
+
+```text
+React Frontend
+       │
+       ▼
+Express REST API
+       │
+       ▼
+PostgreSQL Database
+```
+
+---
 
 ## Authentication
 
-* User registration
-* User login/logout
-* JWT authentication
-* Refresh token rotation
+The application uses JWT-based authentication with refresh token support.
+
+### Security Features
+
+* Access Token authentication
+* Refresh Token rotation
+* HTTP-only cookies
+* Protected routes
 * Role-based authorization
-* Admin-protected routes
-
-## Products
-
-* Create products
-* Update products
-* Delete products
-* View all products
-* Product pagination
-* Product sorting
-* Product search
-* Category filtering
-* Stock management
-
-## Categories
-
-* Create categories
-* Retrieve categories
-* Category-based filtering
-
-## Shopping Cart
-
-* Add products to cart
-* Update cart quantity
-* Remove cart items
-* Duplicate item quantity merging
-* Secure cart ownership validation
-
-## Orders
-
-* Checkout system
-* Order creation
-* Order item records
-* Purchase history
-* Admin order viewing
-* Stock validation during checkout
-* Secure order ownership validation
+* Password hashing using bcrypt
 
 ---
 
-# Project Structure
+## Database Schema
 
-```txt
-backend/
-│
-├── src/
-│   ├── config/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── migrations/
-│   ├── models/
-│   ├── routes/
-│   ├── services/
-│   ├── types/
-│   └── tests/
-│
-├── app.ts
-├── server.ts
-├── migrate.ts
-├── package.json
-└── tsconfig.json
-```
+### Main Tables
+
+* Users
+* Categories
+* Products
+* Cart Items
+* Orders
+* Order Items
+* Reviews
+
+### Relationships
+
+* One user can create multiple orders
+* One order can contain multiple order items
+* One category can contain multiple products
+* One product can receive multiple reviews
 
 ---
 
-# Database Schema
+## API Endpoints
 
-## Users
+### Authentication
 
-Stores authentication and user role information.
+| Method | Endpoint             |
+| ------ | -------------------- |
+| POST   | `/api/auth/register` |
+| POST   | `/api/auth/login`    |
+| POST   | `/api/auth/logout`   |
+| POST   | `/api/auth/refresh`  |
 
-| Column        | Type               |
-| ------------- | ------------------ |
-| id            | SERIAL PRIMARY KEY |
-| name          | VARCHAR(100)       |
-| email         | TEXT UNIQUE        |
-| password      | VARCHAR(100)       |
-| refresh_token | TEXT               |
-| role          | VARCHAR(20)        |
-| created_at    | TIMESTAMP          |
+### Products
 
-## Products
+| Method | Endpoint            |
+| ------ | ------------------- |
+| GET    | `/api/products`     |
+| GET    | `/api/products/:id` |
+| POST   | `/api/products`     |
+| PUT    | `/api/products/:id` |
+| DELETE | `/api/products/:id` |
 
-Stores product details.
+### Cart
 
-| Column         | Type               |
-| -------------- | ------------------ |
-| id             | SERIAL PRIMARY KEY |
-| name           | VARCHAR(100)       |
-| description    | TEXT               |
-| price          | NUMERIC            |
-| image_url      | TEXT               |
-| stock_quantity | INTEGER            |
-| category_id    | INTEGER            |
-| created_at     | TIMESTAMP          |
+| Method | Endpoint        |
+| ------ | --------------- |
+| GET    | `/api/cart`     |
+| POST   | `/api/cart`     |
+| PUT    | `/api/cart/:id` |
+| DELETE | `/api/cart/:id` |
 
-## Categories
+### Orders
 
-Stores product categories.
+| Method | Endpoint                |
+| ------ | ----------------------- |
+| POST   | `/api/orders/checkout`  |
+| GET    | `/api/orders`           |
+| GET    | `/api/orders/:id/items` |
+| GET    | `/api/orders/admin/all` |
 
-| Column     | Type               |
-| ---------- | ------------------ |
-| id         | SERIAL PRIMARY KEY |
-| name       | VARCHAR(100)       |
-| created_at | TIMESTAMP          |
+### Categories
 
-## Cart Items
+| Method | Endpoint          |
+| ------ | ----------------- |
+| GET    | `/api/categories` |
+| POST   | `/api/categories` |
 
-Stores user cart information.
+### Payments
 
-| Column     | Type               |
-| ---------- | ------------------ |
-| id         | SERIAL PRIMARY KEY |
-| user_id    | INTEGER            |
-| product_id | INTEGER            |
-| quantity   | INTEGER            |
-| created_at | TIMESTAMP          |
-
-## Orders
-
-Stores completed purchase records.
-
-| Column       | Type               |
-| ------------ | ------------------ |
-| id           | SERIAL PRIMARY KEY |
-| user_id      | INTEGER            |
-| total_amount | NUMERIC            |
-| status       | VARCHAR(50)        |
-| created_at   | TIMESTAMP          |
-
-## Order Items
-
-Stores purchased products for each order.
-
-| Column     | Type               |
-| ---------- | ------------------ |
-| id         | SERIAL PRIMARY KEY |
-| order_id   | INTEGER            |
-| product_id | INTEGER            |
-| quantity   | INTEGER            |
-| price      | NUMERIC            |
-| created_at | TIMESTAMP          |
+| Method | Endpoint                |
+| ------ | ----------------------- |
+| POST   | `/api/payments/process` |
 
 ---
 
-# Authentication Flow
+## Installation
 
-## Registration
-
-1. User submits registration form.
-2. Password is hashed using bcrypt.
-3. User record is stored in PostgreSQL.
-4. Access token and refresh token are generated.
-5. Refresh token is stored in database and cookie.
-
-## Login
-
-1. User submits email and password.
-2. Password is verified using bcrypt.
-3. Access token and refresh token are generated.
-4. Refresh token cookie is returned.
-
-## Protected Routes
-
-Protected routes require:
-
-```txt
-Authorization: Bearer <token>
-```
-
-Admin-only routes additionally require:
-
-```txt
-role = admin
-```
-
----
-
-# API Endpoints
-
-## Authentication
-
-| Method | Endpoint           | Description               |
-| ------ | ------------------ | ------------------------- |
-| POST   | /api/auth/register | Register new user         |
-| POST   | /api/auth/login    | Login user                |
-| POST   | /api/auth/logout   | Logout user               |
-| POST   | /api/auth/refresh  | Generate new access token |
-
-## Products
-
-| Method | Endpoint                    | Description            |
-| ------ | --------------------------- | ---------------------- |
-| GET    | /api/products               | Get all products       |
-| GET    | /api/products?search=iphone | Search products        |
-| GET    | /api/products?categoryId=1  | Filter by category     |
-| POST   | /api/products               | Create product (Admin) |
-| PATCH  | /api/products/:id           | Update product (Admin) |
-| DELETE | /api/products/:id           | Delete product (Admin) |
-
-## Categories
-
-| Method | Endpoint        | Description             |
-| ------ | --------------- | ----------------------- |
-| GET    | /api/categories | Get categories          |
-| POST   | /api/categories | Create category (Admin) |
-
-## Cart
-
-| Method | Endpoint      | Description          |
-| ------ | ------------- | -------------------- |
-| GET    | /api/cart     | Get cart items       |
-| POST   | /api/cart     | Add item to cart     |
-| PATCH  | /api/cart/:id | Update cart quantity |
-| DELETE | /api/cart/:id | Delete cart item     |
-
-## Orders
-
-| Method | Endpoint              | Description            |
-| ------ | --------------------- | ---------------------- |
-| POST   | /api/orders/checkout  | Checkout cart          |
-| GET    | /api/orders           | Get user orders        |
-| GET    | /api/orders/:id/items | Get order items        |
-| GET    | /api/orders/admin/all | Get all orders (Admin) |
-
----
-
-# Environment Variables
-
-Create a `.env` file inside the backend folder.
-
-```env
-PORT=5000
-DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/b2c_store
-JWT_SECRET=your_access_secret
-JWT_REFRESH_SECRET=your_refresh_secret
-NODE_ENV=development
-```
-
----
-
-# Installation
-
-## Clone Repository
+### Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Krishal-D/b2c-store-fullstack.git
+cd b2c-store-fullstack
 ```
 
-## Navigate to Backend
+### Backend Setup
 
 ```bash
 cd backend
-```
-
-## Install Dependencies
-
-```bash
 npm install
-```
-
----
-
-# Running the Backend
-
-## Development Mode
-
-```bash
+npm run migrate
+npm run seed
 npm run dev
 ```
 
-## Production Build
+### Frontend Setup
 
 ```bash
-npm run build
-```
-
-## Start Production Server
-
-```bash
-npm run start
+cd frontend
+npm install
+npm run dev
 ```
 
 ---
 
-# Database Migration
+## Testing
 
-Run migrations using:
-
-```bash
-npx ts-node migrate.ts
-```
-
----
-
-# Testing
-
-## Run Tests
+### Backend Tests
 
 ```bash
+cd backend
 npm test
 ```
 
-## Current Test Coverage
+### End-to-End Tests
 
-* Authentication flow tests
-* Protected route tests
-* Product API tests
-* Integration tests using Supertest
-
----
-
-# CI Pipeline
-
-GitHub Actions is configured to:
-
-* Install dependencies
-* Build the TypeScript backend
-* Run tests automatically
-
-Workflow file:
-
-```txt
-.github/workflows/backend-ci.yml
+```bash
+cd frontend
+npm run test:e2e
 ```
 
----
+### Test Coverage
 
-# Security Features
-
-* Password hashing using bcrypt
-* JWT authentication
-* Refresh token rotation
-* HttpOnly secure cookies
-* Role-based authorization
-* Cart ownership validation
-* Order ownership validation
-* Stock validation during checkout
+* User authentication
+* Product browsing
+* Product management
+* Cart operations
+* Checkout process
+* Order history
+* Profile management
+* Administrator workflows
 
 ---
 
-# Future Improvements
+## Deployment
 
-* Stripe payment integration
-* Image upload support
-* Transaction-safe checkout
-* Product reviews and ratings
-* Wishlist functionality
+### Production Environment
+
+| Service  | Platform |
+| -------- | -------- |
+| Frontend | Vercel   |
+| Backend  | Render   |
+| Database | Neon     |
+
+---
+
+
+## Future Improvements
+
+* Category management interface
+* Product sorting functionality
+* Product image uploads
 * Email notifications
+* Real payment gateway integration
 * Advanced analytics dashboard
-* Redis caching
-* Docker deployment
+* Dark mode support
 
 ---
 
-# Author
+## Author
 
-Krishal Dhungana
+**Krishal Dhungana**
 
-Western Sydney University
+Bachelor of Information and Communication Technology
+
+Major Project – Full Stack Development
