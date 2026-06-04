@@ -140,18 +140,6 @@ export function Navbar() {
 
             {menuOpen && (
                 <div className="border-t border-neutral-200 bg-white px-6 py-4 md:hidden">
-                    <div className="relative">
-                        <Search
-                            size={18}
-                            className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
-                        />
-                        <Input
-                            label="Search products"
-                            labelClassName="sr-only"
-                            placeholder="Search products..."
-                            className="pl-10 bg-neutral-50 border-neutral-200"
-                        />
-                    </div>
 
                     <nav className="mt-4 flex flex-col gap-3">
                         <NavLink
