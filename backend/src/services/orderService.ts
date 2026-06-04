@@ -80,8 +80,11 @@ export const orderService = {
         return orderModel.getOrdersByUser(userId)
     },
 
-    async getOrderItems(orderId: unknown, userId: number) {
-
+    async getOrderItems(
+        orderId: unknown,
+        userId: number,
+        role: string
+    ) {
         const parsedOrderId = Number(orderId)
 
         if (!Number.isInteger(parsedOrderId) || parsedOrderId <= 0) {
@@ -89,11 +92,12 @@ export const orderService = {
         }
 
         const order = await orderModel.getOrderById(parsedOrderId)
+
         if (!order) {
             throw Object.assign(new Error("Order not found"), { status: 404 })
         }
 
-        if (order.user_id !== userId) {
+        if (role !== "admin" && order.user_id !== userId) {
             throw Object.assign(new Error("Access denied"), { status: 403 })
         }
 
