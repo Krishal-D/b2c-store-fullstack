@@ -1,8 +1,8 @@
-# b2c-store API Documentation
+# Cartly API Documentation
 
 A RESTful API for a B2C e-commerce store. Supports product browsing, cart management, order placement, and an admin panel for store management.
 
-**Base URL:** `http://localhost:5000`
+**Base URL:** `http://localhost:5000/api`
 
 ---
 
