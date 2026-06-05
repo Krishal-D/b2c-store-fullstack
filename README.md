@@ -464,7 +464,6 @@ The administrator account is automatically created by the seed script.
 
 * Product sorting functionality
 * Category management interface
-* Product image uploads
 * Email notifications
 * Real payment gateway integration
 * Analytics dashboard
