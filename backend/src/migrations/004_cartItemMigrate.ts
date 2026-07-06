@@ -12,6 +12,26 @@ export async function cartItemMigrate(pool: Pool): Promise<void> {
             )
         `)
 
+        await pool.query(`
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1
+                    FROM pg_constraint
+                    WHERE conname = 'cart_items_quantity_positive'
+                ) THEN
+                    ALTER TABLE cart_items
+                    ADD CONSTRAINT cart_items_quantity_positive CHECK (quantity > 0);
+                END IF;
+            END
+            $$;
+        `)
+
+        await pool.query(`
+            CREATE UNIQUE INDEX IF NOT EXISTS cart_items_user_product_unique
+            ON cart_items(user_id, product_id)
+        `)
+
         console.log("Cart items table created")
 
     } catch (error) {

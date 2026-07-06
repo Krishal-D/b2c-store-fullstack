@@ -1,5 +1,6 @@
 import { orderService } from "./orderService"
 import { orderModel } from "../models/orderModel"
+import { validationError } from "../utils/httpError"
 
 interface MockPaymentInput {
     cardName: string
@@ -8,26 +9,32 @@ interface MockPaymentInput {
     cvv: string
 }
 
-function validationError(message: string): Error {
-    return Object.assign(new Error(message), { status: 400 })
-}
-
 export const paymentService = {
     async mockCheckout(userId: number, data: MockPaymentInput) {
         const { cardName, cardNumber, expiry, cvv } = data
 
-        if (!cardName || !cardNumber || !expiry || !cvv) {
+        if (
+            !cardName?.trim() ||
+            !cardNumber ||
+            !expiry?.trim() ||
+            !cvv
+        ) {
             throw validationError("All payment fields are required")
         }
 
         const cleanedCardNumber = String(cardNumber).replace(/\s/g, "")
+        const cleanedCvv = String(cvv).trim()
 
         if (cleanedCardNumber !== "4242424242424242") {
             throw validationError("Use demo card number 4242 4242 4242 4242")
         }
 
-        if (String(cvv).length < 3 || String(cvv).length > 4) {
+        if (!/^\d{3,4}$/.test(cleanedCvv)) {
             throw validationError("Invalid CVV")
+        }
+
+        if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry.trim())) {
+            throw validationError("Expiry must use MM/YY format")
         }
 
         const order = await orderService.checkout(userId)

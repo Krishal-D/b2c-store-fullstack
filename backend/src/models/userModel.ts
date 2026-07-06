@@ -12,6 +12,15 @@ export const userModel = {
         return result.rows[0] || null
     },
 
+    async findUserById(userId: number): Promise<User | null> {
+        const result = await pool.query(
+            `SELECT * FROM users WHERE id = $1`,
+            [userId]
+        )
+
+        return result.rows[0] || null
+    },
+
     async createUser(name: string, email: string, hashedPassword: string): Promise<User> {
         const result = await pool.query(
             `

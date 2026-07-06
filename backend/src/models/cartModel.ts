@@ -1,3 +1,4 @@
+import type { Pool, PoolClient } from "pg"
 import { pool } from "../config/db"
 import {
     AddCartItemInput,
@@ -5,12 +6,17 @@ import {
     UpdateCartItemInput
 } from "../types/cartTypes"
 
+type QueryRunner = Pool | PoolClient
+
 export const cartModel = {
 
-    async getCartItems(userId: number): Promise<CartItem[]> {
-        const result = await pool.query(
+    async getCartItems(
+        userId: number,
+        db: QueryRunner = pool
+    ): Promise<CartItem[]> {
+        const result = await db.query(
             `
-        SELECT 
+        SELECT
             cart_items.id,
             cart_items.user_id,
             cart_items.product_id,
@@ -33,12 +39,43 @@ export const cartModel = {
         return result.rows
     },
 
+    async getCartItemsForCheckout(
+        userId: number,
+        db: QueryRunner
+    ): Promise<CartItem[]> {
+        const result = await db.query(
+            `
+        SELECT
+            cart_items.id,
+            cart_items.user_id,
+            cart_items.product_id,
+            cart_items.quantity,
+            cart_items.created_at,
+            products.name,
+            products.description,
+            products.price,
+            products.image_url,
+            products.stock_quantity
+        FROM cart_items
+        JOIN products
+        ON cart_items.product_id = products.id
+        WHERE cart_items.user_id = $1
+        ORDER BY cart_items.product_id ASC
+        FOR UPDATE OF cart_items, products
+        `,
+            [userId]
+        )
+
+        return result.rows
+    },
+
     async addCartItem(
         userId: number,
-        data: AddCartItemInput
+        data: AddCartItemInput,
+        db: QueryRunner = pool
     ): Promise<CartItem> {
 
-        const result = await pool.query(
+        const result = await db.query(
             `
             INSERT INTO cart_items
             (user_id, product_id, quantity)
@@ -58,10 +95,11 @@ export const cartModel = {
     async updateCartItem(
         data: UpdateCartItemInput,
         id: number,
-        userId: number
+        userId: number,
+        db: QueryRunner = pool
     ): Promise<CartItem | null> {
 
-        const result = await pool.query(
+        const result = await db.query(
             `
             UPDATE cart_items
             SET quantity = $1
@@ -78,8 +116,12 @@ export const cartModel = {
         return result.rows[0] || null
     },
 
-    async deleteCartItem(id: number, userId: number): Promise<CartItem | null> {
-        const result = await pool.query(
+    async deleteCartItem(
+        id: number,
+        userId: number,
+        db: QueryRunner = pool
+    ): Promise<CartItem | null> {
+        const result = await db.query(
             `
             DELETE FROM cart_items
             WHERE id = $1 AND user_id=$2
@@ -92,9 +134,10 @@ export const cartModel = {
     },
     async findCartItemByUserAndProduct(
         userId: number,
-        productId: number
+        productId: number,
+        db: QueryRunner = pool
     ): Promise<CartItem | null> {
-        const result = await pool.query(
+        const result = await db.query(
             `
         SELECT * FROM cart_items
         WHERE user_id = $1 AND product_id = $2

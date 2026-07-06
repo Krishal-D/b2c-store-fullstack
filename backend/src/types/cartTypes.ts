@@ -4,6 +4,11 @@ export interface CartItem {
     product_id: number
     quantity: number
     created_at: Date
+    name?: string
+    description?: string
+    price?: string
+    image_url?: string | null
+    stock_quantity?: number
 }
 
 export interface AddCartItemInput {

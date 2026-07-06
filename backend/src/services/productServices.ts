@@ -1,9 +1,10 @@
 import { productModel } from "../models/productModel"
 import { CreateProductInput, UpdateProductInput } from "../types/productTypes"
-
-function validationError(message: string): Error {
-    return Object.assign(new Error(message), { status: 400 })
-}
+import {
+    httpError,
+    parsePositiveInteger,
+    validationError
+} from "../utils/httpError"
 
 export const productService = {
     async getProducts(search?: unknown, categoryId?: unknown, page?: unknown, limit?: unknown, sortBy?: unknown, sortOrder?: unknown) {
@@ -33,16 +34,12 @@ export const productService = {
     },
 
     async getProductById(id: unknown) {
-        const productId = Number(id)
-
-        if (!Number.isInteger(productId) || productId <= 0) {
-            throw validationError("Invalid product id")
-        }
+        const productId = parsePositiveInteger(id, "Product id")
 
         const product = await productModel.getProductById(productId)
 
         if (!product) {
-            throw Object.assign(new Error("Product not found"), { status: 404 })
+            throw httpError("Product not found", 404)
         }
 
         return product
@@ -51,39 +48,34 @@ export const productService = {
     async createProduct(data: CreateProductInput) {
         if (!data.name || !data.name.trim()) throw validationError("Product name is required")
         if (!data.description || !data.description.trim()) throw validationError("Product description is required")
-        if (!data.price || data.price <= 0) throw validationError("Product price must be greater than 0")
-        if (data.stock_quantity < 0) throw validationError("Stock quantity cannot be negative")
+        if (!Number.isFinite(Number(data.price)) || Number(data.price) <= 0) throw validationError("Product price must be greater than 0")
+        if (!Number.isInteger(Number(data.stock_quantity)) || Number(data.stock_quantity) < 0) throw validationError("Stock quantity cannot be negative")
 
         return productModel.createProduct(data)
     },
 
     async updateProduct(id: unknown, data: UpdateProductInput) {
-        const productId = Number(id)
+        const productId = parsePositiveInteger(id, "Product id")
 
-        if (!Number.isInteger(productId) || productId <= 0) {
-            throw validationError("Invalid product id")
-        }
+        if (data.price !== undefined && (!Number.isFinite(Number(data.price)) || Number(data.price) <= 0)) throw validationError("Product price must be greater than 0")
+        if (data.stock_quantity !== undefined && (!Number.isInteger(Number(data.stock_quantity)) || Number(data.stock_quantity) < 0)) throw validationError("Stock quantity cannot be negative")
 
         const product = await productModel.updateProduct(productId, data)
 
         if (!product) {
-            throw Object.assign(new Error("Product not found"), { status: 404 })
+            throw httpError("Product not found", 404)
         }
 
         return product
     },
 
     async deleteProduct(id: unknown) {
-        const productId = Number(id)
-
-        if (!Number.isInteger(productId) || productId <= 0) {
-            throw validationError("Invalid product id")
-        }
+        const productId = parsePositiveInteger(id, "Product id")
 
         const product = await productModel.deleteProduct(productId)
 
         if (!product) {
-            throw Object.assign(new Error("Product not found"), { status: 404 })
+            throw httpError("Product not found", 404)
         }
 
         return product

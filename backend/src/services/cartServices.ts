@@ -1,12 +1,14 @@
 import { cartModel } from "../models/cartModel"
+import { productModel } from "../models/productModel"
 import {
     AddCartItemInput,
     UpdateCartItemInput
 } from "../types/cartTypes"
-
-function validationError(message: string): Error {
-    return Object.assign(new Error(message), { status: 400 })
-}
+import {
+    httpError,
+    parsePositiveInteger,
+    validationError
+} from "../utils/httpError"
 
 export const cartService = {
 
@@ -19,30 +21,39 @@ export const cartService = {
         data: AddCartItemInput
     ) {
 
-        if (!data.product_id || data.product_id <= 0) {
-            throw validationError("Valid product id is required")
-        }
-
-        if (!data.quantity || data.quantity <= 0) {
-            throw validationError("Quantity must be greater than 0")
-        }
+        const productId = parsePositiveInteger(data.product_id, "Product id")
+        const quantity = parsePositiveInteger(data.quantity, "Quantity")
+        const product = await productModel.getProductById(productId)
 
         const existingCartItem = await cartModel.findCartItemByUserAndProduct(
             userId,
-            data.product_id
+            productId
         )
+
+        if (!product) {
+            throw httpError("Product not found", 404)
+        }
+
+        const nextQuantity = (existingCartItem?.quantity ?? 0) + quantity
+
+        if (nextQuantity > product.stock_quantity) {
+            throw validationError(`Only ${product.stock_quantity} item(s) available for ${product.name}`)
+        }
 
         if (existingCartItem) {
             return cartModel.updateCartItem(
                 {
-                    quantity: existingCartItem.quantity + data.quantity
+                    quantity: nextQuantity
                 },
                 existingCartItem.id,
                 userId
             )
         }
 
-        return cartModel.addCartItem(userId, data)
+        return cartModel.addCartItem(userId, {
+            product_id: productId,
+            quantity
+        })
     },
 
     async updateCartItem(
@@ -51,47 +62,43 @@ export const cartService = {
         data: UpdateCartItemInput
     ) {
 
-        const cartItemId = Number(id)
+        const cartItemId = parsePositiveInteger(id, "Cart item id")
+        const quantity = parsePositiveInteger(data.quantity, "Quantity")
+        const cartItem = await cartModel.getCartItems(userId)
+            .then(items => items.find(item => item.id === cartItemId))
 
-        if (!Number.isInteger(cartItemId) || cartItemId <= 0) {
-            throw validationError("Invalid cart item id")
+        if (!cartItem) {
+            throw httpError("Cart item not found", 404)
         }
 
-        if (!data.quantity || data.quantity <= 0) {
-            throw validationError("Quantity must be greater than 0")
+        if (
+            typeof cartItem.stock_quantity === "number" &&
+            quantity > cartItem.stock_quantity
+        ) {
+            throw validationError(`Only ${cartItem.stock_quantity} item(s) available for ${cartItem.name}`)
         }
 
-        const cartItem = await cartModel.updateCartItem(
-            data,
+        const updatedCartItem = await cartModel.updateCartItem(
+            { quantity },
             cartItemId,
             userId
         )
 
-        if (!cartItem) {
-            throw Object.assign(
-                new Error("Cart item not found"),
-                { status: 404 }
-            )
+        if (!updatedCartItem) {
+            throw httpError("Cart item not found", 404)
         }
 
-        return cartItem
+        return updatedCartItem
     },
 
     async deleteCartItem(id: unknown, userId: number) {
 
-        const cartItemId = Number(id)
-
-        if (!Number.isInteger(cartItemId) || cartItemId <= 0) {
-            throw validationError("Invalid cart item id")
-        }
+        const cartItemId = parsePositiveInteger(id, "Cart item id")
 
         const cartItem = await cartModel.deleteCartItem(cartItemId, userId)
 
         if (!cartItem) {
-            throw Object.assign(
-                new Error("Cart item not found"),
-                { status: 404 }
-            )
+            throw httpError("Cart item not found", 404)
         }
 
         return cartItem

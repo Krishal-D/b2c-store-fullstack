@@ -1,14 +1,18 @@
+import type { Pool, PoolClient } from "pg"
 import { pool } from "../config/db"
 import { Order, OrderItem } from "../types/orderTypes"
+
+type QueryRunner = Pool | PoolClient
 
 export const orderModel = {
 
     async createOrder(
         userId: number,
-        totalAmount: number
+        totalAmount: number,
+        db: QueryRunner = pool
     ): Promise<Order> {
 
-        const result = await pool.query(
+        const result = await db.query(
             `
             INSERT INTO orders
             (user_id, total_amount)
@@ -25,10 +29,11 @@ export const orderModel = {
         orderId: number,
         productId: number,
         quantity: number,
-        price: number
+        price: number,
+        db: QueryRunner = pool
     ): Promise<OrderItem> {
 
-        const result = await pool.query(
+        const result = await db.query(
             `
             INSERT INTO order_items
             (order_id, product_id, quantity, price)
@@ -62,7 +67,7 @@ export const orderModel = {
     async getOrderItems(orderId: number): Promise<OrderItem[]> {
         const result = await pool.query(
             `
-        SELECT 
+        SELECT
             order_items.id,
             order_items.order_id,
             order_items.product_id,
@@ -102,9 +107,10 @@ export const orderModel = {
     },
     async updateOrderStatus(
         orderId: number,
-        status: string
+        status: string,
+        db: QueryRunner = pool
     ): Promise<Order> {
-        const result = await pool.query(
+        const result = await db.query(
             `
         UPDATE orders
         SET status = $1

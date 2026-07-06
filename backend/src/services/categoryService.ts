@@ -1,8 +1,5 @@
 import { categoryModel } from "../models/categoryModel"
-
-function validationError(message: string): Error {
-    return Object.assign(new Error(message), { status: 400 })
-}
+import { validationError } from "../utils/httpError"
 
 export const categoryService = {
 
