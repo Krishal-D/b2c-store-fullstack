@@ -40,15 +40,15 @@ The application was developed using React, TypeScript, Express.js, PostgreSQL, a
 * Add products to cart
 * Update cart quantities
 * Remove products from cart
-* Simulated payment checkout
+* Simulated payment checkout for demo orders
 * View order history
 * View order details
 * Manage profile information
-* Secure logout
+* Logout with server-side refresh-token invalidation
 
 ## Administrator Features
 
-* Secure administrator login
+* Role-protected administrator login
 * Administrator dashboard
 * Create products
 * Edit products
@@ -150,16 +150,20 @@ b2c-store-fullstack
 
 # Authentication
 
-The application uses JWT-based authentication with refresh token support.
+The application uses JWT-based authentication with refresh token support. Access tokens are returned to the client, while refresh tokens are stored in HTTP-only cookies and checked against the database before rotation.
 
 ## Security Features
 
 * Access token authentication
-* Refresh token rotation
-* HTTP-only cookies
+* Refresh token rotation with stale-token rejection
+* HTTP-only refresh-token cookies
 * Protected routes
 * Role-based authorization
 * Password hashing using bcrypt
+
+## Security Notes
+
+This is a portfolio/demo application, not a fully hardened production commerce system. Checkout uses transactional stock updates and cart validation, but payment processing is simulated and should be replaced with a real payment provider before handling live card data.
 
 ---
 

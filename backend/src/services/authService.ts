@@ -7,10 +7,7 @@ import {
     verifyRefreshToken
 } from "../config/auth"
 import { TokenPayload } from "../types/authTypes"
-
-function validationError(message: string): Error {
-    return Object.assign(new Error(message), { status: 400 })
-}
+import { httpError, validationError } from "../utils/httpError"
 
 export const authService = {
     async register(name: unknown, email: unknown, password: unknown) {
@@ -29,7 +26,7 @@ export const authService = {
         const existing = await userModel.findUserByEmail(email.trim())
 
         if (existing) {
-            throw Object.assign(new Error("Email already in use"), { status: 409 })
+            throw httpError("Email already in use", 409)
         }
 
         const hashedPassword = await hashPassword(password)
@@ -75,13 +72,13 @@ export const authService = {
         const user = await userModel.findUserByEmail(email.trim())
 
         if (!user || !user.password) {
-            throw Object.assign(new Error("Invalid credentials"), { status: 401 })
+            throw httpError("Invalid credentials", 401)
         }
 
         const passwordMatch = await comparePassword(password, user.password)
 
         if (!passwordMatch) {
-            throw Object.assign(new Error("Invalid credentials"), { status: 401 })
+            throw httpError("Invalid credentials", 401)
         }
 
         const payload: TokenPayload = {
@@ -121,24 +118,36 @@ export const authService = {
 
     async refresh(token: unknown) {
         if (!token || typeof token !== "string") {
-            throw Object.assign(new Error("Refresh token is required"), { status: 401 })
+            throw httpError("Refresh token is required", 401)
         }
 
-        const user = verifyRefreshToken(token)
+        const tokenUser = verifyRefreshToken(token)
 
-        if (!user) {
-            throw Object.assign(new Error("Invalid token"), { status: 401 })
+        if (!tokenUser) {
+            throw httpError("Invalid token", 401)
         }
 
-        const newRefreshToken = generateRefreshToken(user)
-        const newAccessToken = generateAccessToken(user)
+        const storedUser = await userModel.findUserById(tokenUser.id)
 
-        await userModel.updateRefreshToken(user.id, newRefreshToken)
+        if (!storedUser || storedUser.refresh_token !== token) {
+            throw httpError("Invalid token", 401)
+        }
+
+        const payload: TokenPayload = {
+            id: storedUser.id,
+            email: storedUser.email,
+            role: storedUser.role
+        }
+
+        const newRefreshToken = generateRefreshToken(payload)
+        const newAccessToken = generateAccessToken(payload)
+
+        await userModel.updateRefreshToken(payload.id, newRefreshToken)
 
         return {
             newAccessToken,
             newRefreshToken,
-            user
+            user: payload
         }
     }
 }

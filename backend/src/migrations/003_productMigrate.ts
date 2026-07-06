@@ -15,6 +15,30 @@ export async function productMigrate(pool: Pool): Promise<void> {
             )
         `)
 
+        await pool.query(`
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1
+                    FROM pg_constraint
+                    WHERE conname = 'products_price_positive'
+                ) THEN
+                    ALTER TABLE products
+                    ADD CONSTRAINT products_price_positive CHECK (price > 0);
+                END IF;
+
+                IF NOT EXISTS (
+                    SELECT 1
+                    FROM pg_constraint
+                    WHERE conname = 'products_stock_non_negative'
+                ) THEN
+                    ALTER TABLE products
+                    ADD CONSTRAINT products_stock_non_negative CHECK (stock_quantity >= 0);
+                END IF;
+            END
+            $$;
+        `)
+
         console.log("Products table created")
 
     } catch (error) {

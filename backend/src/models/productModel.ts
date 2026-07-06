@@ -1,9 +1,12 @@
+import type { Pool, PoolClient } from "pg"
 import { pool } from "../config/db"
 import {
     CreateProductInput,
     Product,
     UpdateProductInput
 } from "../types/productTypes"
+
+type QueryRunner = Pool | PoolClient
 
 export const productModel = {
     async getAllProducts(
@@ -28,9 +31,24 @@ export const productModel = {
         return result.rows
     },
 
-    async getProductById(id: number): Promise<Product | null> {
-        const result = await pool.query(
+    async getProductById(
+        id: number,
+        db: QueryRunner = pool
+    ): Promise<Product | null> {
+        const result = await db.query(
             `SELECT * FROM products WHERE id = $1`,
+            [id]
+        )
+
+        return result.rows[0] || null
+    },
+
+    async getProductByIdForUpdate(
+        id: number,
+        db: QueryRunner
+    ): Promise<Product | null> {
+        const result = await db.query(
+            `SELECT * FROM products WHERE id = $1 FOR UPDATE`,
             [id]
         )
 
@@ -40,7 +58,7 @@ export const productModel = {
     async createProduct(data: CreateProductInput): Promise<Product> {
         const result = await pool.query(
             `
-            INSERT INTO products 
+            INSERT INTO products
             (name, description, price, image_url, stock_quantity, category_id)
             VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING *
@@ -123,15 +141,20 @@ export const productModel = {
 
     async reduceStock(
         productId: number,
-        quantity: number
-    ): Promise<void> {
-        await pool.query(
+        quantity: number,
+        db: QueryRunner = pool
+    ): Promise<Product | null> {
+        const result = await db.query(
             `
         UPDATE products
         SET stock_quantity = stock_quantity - $1
         WHERE id = $2
+        AND stock_quantity >= $1
+        RETURNING *
         `,
             [quantity, productId]
         )
+
+        return result.rows[0] || null
     }
 }

@@ -1,6 +1,7 @@
 import dotenv from "dotenv"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
+import { randomUUID } from "crypto"
 import { TokenPayload } from "../types/authTypes"
 
 dotenv.config()
@@ -26,7 +27,8 @@ export const generateRefreshToken = (user: TokenPayload): string => {
         {
             id: user.id,
             email: user.email,
-            role: user.role
+            role: user.role,
+            jti: randomUUID()
         },
         JWT_REFRESH_SECRET,
         { expiresIn: "7d" }

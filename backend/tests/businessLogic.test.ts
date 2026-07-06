@@ -1,6 +1,21 @@
 import request from "supertest"
+import type { Response } from "supertest"
 import app from "../app"
 import { pool } from "../src/config/db"
+
+function getRefreshCookie(response: Response): string {
+    const setCookieHeader = response.headers["set-cookie"]
+    const cookies = Array.isArray(setCookieHeader)
+        ? setCookieHeader
+        : [setCookieHeader]
+    const refreshCookie = cookies.find(cookie => cookie?.startsWith("refreshToken="))
+
+    if (!refreshCookie) {
+        throw new Error("Expected refresh token cookie")
+    }
+
+    return refreshCookie.split(";")[0]
+}
 
 describe("B2C Business Logic", () => {
     const userEmail = `user${Date.now()}@test.com`
@@ -90,6 +105,30 @@ describe("B2C Business Logic", () => {
             })
 
         expect(response.status).toBe(403)
+    })
+
+    it("should reject adding more cart quantity than available stock", async () => {
+        const product = await request(app)
+            .post("/api/products")
+            .set("Authorization", `Bearer ${adminToken}`)
+            .send({
+                name: "Limited Product",
+                description: "Only two items available",
+                price: 20,
+                stock_quantity: 2,
+                category_id: null
+            })
+
+        const response = await request(app)
+            .post("/api/cart")
+            .set("Authorization", `Bearer ${userToken}`)
+            .send({
+                product_id: product.body.product.id,
+                quantity: 3
+            })
+
+        expect(response.status).toBe(400)
+        expect(response.body.message).toContain("Only 2 item(s) available")
     })
 
     it("should merge cart quantity when same product is added twice", async () => {
@@ -182,8 +221,13 @@ describe("B2C Business Logic", () => {
             .set("Authorization", `Bearer ${userToken}`)
             .send({
                 product_id: lowStockProductId,
-                quantity: 2
+                quantity: 1
             })
+
+        await pool.query(
+            `UPDATE products SET stock_quantity = 0 WHERE id = $1`,
+            [lowStockProductId]
+        )
 
         const response = await request(app)
             .post("/api/orders/checkout")
@@ -191,5 +235,28 @@ describe("B2C Business Logic", () => {
 
         expect(response.status).toBe(400)
         expect(response.body.message).toContain("Not enough stock")
+    })
+
+    it("should reject a refresh token after it has been rotated", async () => {
+        const email = `refresh${Date.now()}@test.com`
+        const register = await request(app).post("/api/auth/register").send({
+            name: "Refresh User",
+            email,
+            password: "password123"
+        })
+        const originalRefreshCookie = getRefreshCookie(register)
+
+        const refresh = await request(app)
+            .post("/api/auth/refresh")
+            .set("Cookie", originalRefreshCookie)
+
+        expect(refresh.status).toBe(200)
+        expect(getRefreshCookie(refresh)).not.toBe(originalRefreshCookie)
+
+        const staleRefresh = await request(app)
+            .post("/api/auth/refresh")
+            .set("Cookie", originalRefreshCookie)
+
+        expect(staleRefresh.status).toBe(401)
     })
 })
