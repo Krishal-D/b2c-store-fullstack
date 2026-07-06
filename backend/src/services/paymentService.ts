@@ -12,18 +12,19 @@ interface MockPaymentInput {
 export const paymentService = {
     async mockCheckout(userId: number, data: MockPaymentInput) {
         const { cardName, cardNumber, expiry, cvv } = data
+        const cleanedCardName = String(cardName ?? "").trim()
+        const cleanedCardNumber = String(cardNumber ?? "").replace(/\s/g, "")
+        const cleanedExpiry = String(expiry ?? "").trim()
+        const cleanedCvv = String(cvv ?? "").trim()
 
         if (
-            !cardName?.trim() ||
-            !cardNumber ||
-            !expiry?.trim() ||
-            !cvv
+            !cleanedCardName ||
+            !cleanedCardNumber ||
+            !cleanedExpiry ||
+            !cleanedCvv
         ) {
             throw validationError("All payment fields are required")
         }
-
-        const cleanedCardNumber = String(cardNumber).replace(/\s/g, "")
-        const cleanedCvv = String(cvv).trim()
 
         if (cleanedCardNumber !== "4242424242424242") {
             throw validationError("Use demo card number 4242 4242 4242 4242")
@@ -33,7 +34,7 @@ export const paymentService = {
             throw validationError("Invalid CVV")
         }
 
-        if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry.trim())) {
+        if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cleanedExpiry)) {
             throw validationError("Expiry must use MM/YY format")
         }
 
