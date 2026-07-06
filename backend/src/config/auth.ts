@@ -15,8 +15,7 @@ export const generateAccessToken = (user: TokenPayload): string => {
         {
             id: user.id,
             email: user.email,
-            role: user.role,
-            jti: randomUUID()
+            role: user.role
         },
         JWT_SECRET,
         { expiresIn: "15m" }
@@ -28,7 +27,8 @@ export const generateRefreshToken = (user: TokenPayload): string => {
         {
             id: user.id,
             email: user.email,
-            role: user.role
+            role: user.role,
+            jti: randomUUID()
         },
         JWT_REFRESH_SECRET,
         { expiresIn: "7d" }
